@@ -5,7 +5,7 @@ export const STORE_CONFIG = {
   tagline: 'هدية صغيرة.. تصنع ذكرى كبيرة',
   currency: 'QAR',
   currencyName: 'ريال قطري',
-  whatsappNumber: '97400000000',
+  whatsappNumber: '970595263662',
   phone: '+974 0000 0000',
   email: 'info@lamsahadiya.qa',
   instagram: 'lamsahadiya',
