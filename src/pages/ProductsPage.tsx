@@ -3,11 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import { PRODUCTS, CATEGORIES, OCCASIONS, PRICE_RANGES, SORT_OPTIONS } from '@/data/store';
+import { CATEGORIES, OCCASIONS, PRICE_RANGES, SORT_OPTIONS } from '@/data/store';
 import type { SortOptionId } from '@/data/store';
 import type { CategoryId, OccasionId } from '@/types';
+import { useProducts } from '@/hooks/useProducts';
 
 export default function ProductsPage() {
+  const { products, loading } = useProducts();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const searchQuery = searchParams.get('search') ?? '';
@@ -30,7 +32,7 @@ export default function ProductsPage() {
   };
 
   const filteredProducts = useMemo(() => {
-    let result = [...PRODUCTS];
+    let result = [...products];
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -72,7 +74,7 @@ export default function ProductsPage() {
     }
 
     return result;
-  }, [searchQuery, categoryFilter, occasionFilter, priceFilter, sortOption]);
+  }, [products, searchQuery, categoryFilter, occasionFilter, priceFilter, sortOption]);
 
   const activeFiltersCount =
     (categoryFilter !== 'all' ? 1 : 0) +
@@ -251,6 +253,10 @@ export default function ProductsPage() {
 
           {/* Products Grid */}
           <div className="lg:col-span-3">
+            {loading ? (
+              <div className="text-center py-20 text-brown-400">جارٍ تحميل المنتجات...</div>
+            ) : (
+            <>
             <p className="text-sm text-brown-400 mb-4">
               عدد المنتجات: <span className="font-bold text-brown-600">{filteredProducts.length}</span>
             </p>
@@ -268,6 +274,8 @@ export default function ProductsPage() {
                   <ProductCard key={product.id} product={product} />
                 ))}
               </div>
+            )}
+            </>
             )}
           </div>
         </div>

@@ -16,6 +16,8 @@ import CustomGiftPage from '@/pages/CustomGiftPage';
 import AboutPage from '@/pages/AboutPage';
 import ContactPage from '@/pages/ContactPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import AdminLoginPage from '@/pages/AdminLoginPage';
+import AdminDashboardPage from '@/pages/AdminDashboardPage';
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
               <Route path="/custom-gift" element={<CustomGiftPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route path="/admin" element={<AdminDashboardPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>

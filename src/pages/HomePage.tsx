@@ -20,8 +20,9 @@ import {
 } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import StarRating from '@/components/StarRating';
-import { CATEGORIES, PRODUCTS, TESTIMONIALS, WHY_US, OCCASIONS } from '@/data/store';
+import { CATEGORIES, TESTIMONIALS, WHY_US, OCCASIONS } from '@/data/store';
 import { buildWhatsAppUrl } from '@/utils/whatsapp';
+import { useProducts } from '@/hooks/useProducts';
 
 const ICON_MAP: Record<string, typeof Gift> = {
   Gift,
@@ -40,7 +41,9 @@ const ICON_MAP: Record<string, typeof Gift> = {
 };
 
 export default function HomePage() {
-  const bestSellers = PRODUCTS.filter((p) => p.badge === 'bestseller').slice(0, 4);
+  const { products, loading } = useProducts();
+  const markedBestSellers = products.filter((p) => p.badge === 'bestseller');
+  const bestSellers = (markedBestSellers.length > 0 ? markedBestSellers : products).slice(0, 4);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const touchStartX = useRef(0);
@@ -214,9 +217,15 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-            {bestSellers.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            {loading ? (
+              <div className="col-span-full text-center py-8 text-brown-400">جارٍ تحميل المنتجات...</div>
+            ) : bestSellers.length === 0 ? (
+              <div className="col-span-full text-center py-8 text-brown-400">لا توجد منتجات حاليًا</div>
+            ) : (
+              bestSellers.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            )}
           </div>
           <div className="text-center mt-6 sm:mt-8">
             <Link to="/products" className="btn-outline text-sm">
