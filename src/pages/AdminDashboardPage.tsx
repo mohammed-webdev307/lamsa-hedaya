@@ -13,6 +13,7 @@ interface AdminProduct {
   old_price: number | null;
   category: string | null;
   image_url: string | null;
+  gallery: string[] | null;
   available: boolean;
   visible: boolean;
   created_at?: string;
@@ -26,6 +27,7 @@ interface ProductForm {
   old_price: string;
   category: string;
   image_url: string;
+  gallery: string[];
   available: boolean;
   visible: boolean;
 }
@@ -37,12 +39,24 @@ const EMPTY_FORM: ProductForm = {
   old_price: '',
   category: 'boxes',
   image_url: '',
+  gallery: [],
   available: true,
   visible: true,
 };
 
 function formatMoney(value: number) {
   return `${Number(value).toLocaleString('en-US')} ر.ق`;
+}
+
+function normalizeImages(imageUrl: string, gallery: string[]) {
+  const cleaned = gallery.map((url) => url.trim()).filter(Boolean);
+  const main = imageUrl.trim();
+
+  if (!main) {
+    return Array.from(new Set(cleaned));
+  }
+
+  return Array.from(new Set([main, ...cleaned.filter((url) => url !== main)]));
 }
 
 export default function AdminDashboardPage() {
@@ -76,9 +90,10 @@ export default function AdminDashboardPage() {
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError('');
+
     const { data, error: fetchError } = await supabase
       .from('products')
-      .select('id,name,description,price,old_price,category,image_url,available,visible,created_at,updated_at')
+      .select('id,name,description,price,old_price,category,image_url,gallery,available,visible,created_at,updated_at')
       .order('created_at', { ascending: false });
 
     if (fetchError) {
@@ -87,6 +102,7 @@ export default function AdminDashboardPage() {
     } else {
       setProducts((data ?? []) as AdminProduct[]);
     }
+
     setLoading(false);
   }, []);
 
@@ -97,18 +113,28 @@ export default function AdminDashboardPage() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return products;
-    return products.filter((p) => p.name.toLowerCase().includes(q) || (p.category ?? '').toLowerCase().includes(q));
+
+    return products.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.category ?? '').toLowerCase().includes(q),
+    );
   }, [products, search]);
 
   function openAdd() {
     setEditingId(null);
-    setForm(EMPTY_FORM);
+    setForm({ ...EMPTY_FORM, gallery: [] });
     setError('');
     setSuccess('');
     setShowForm(true);
   }
 
   function openEdit(product: AdminProduct) {
+    const gallery = normalizeImages(
+      product.image_url ?? '',
+      Array.isArray(product.gallery) ? product.gallery : [],
+    );
+
     setEditingId(product.id);
     setForm({
       name: product.name,
@@ -116,10 +142,12 @@ export default function AdminDashboardPage() {
       price: String(product.price ?? ''),
       old_price: product.old_price == null ? '' : String(product.old_price),
       category: product.category ?? 'boxes',
-      image_url: product.image_url ?? '',
+      image_url: product.image_url ?? gallery[0] ?? '',
+      gallery,
       available: product.available,
       visible: product.visible,
     });
+
     setError('');
     setSuccess('');
     setShowForm(true);
@@ -127,37 +155,92 @@ export default function AdminDashboardPage() {
   }
 
   async function handleImageUpload(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      setError('اختر ملف صورة فقط');
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+
+    const invalidType = files.find((file) => !file.type.startsWith('image/'));
+    if (invalidType) {
+      setError(`الملف "${invalidType.name}" ليس صورة`);
+      e.target.value = '';
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setError('حجم الصورة يجب أن يكون أقل من 5 ميجابايت');
+
+    const tooLarge = files.find((file) => file.size > 5 * 1024 * 1024);
+    if (tooLarge) {
+      setError(`الصورة "${tooLarge.name}" أكبر من 5 ميجابايت`);
+      e.target.value = '';
       return;
     }
 
     setUploading(true);
     setError('');
-    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    const fileName = `${crypto.randomUUID()}.${extension}`;
-    const filePath = `products/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage.from('product-images').upload(filePath, file, {
-      cacheControl: '3600',
-      upsert: false,
-    });
+    const uploadedUrls: string[] = [];
 
-    if (uploadError) {
-      setError('تعذر رفع الصورة. شغّل ملف supabase-storage-setup.sql مرة واحدة في Supabase ثم حاول مجددًا.');
-      setUploading(false);
-      return;
+    for (const file of files) {
+      const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+      const fileName = `${crypto.randomUUID()}.${extension}`;
+      const filePath = `products/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (uploadError) {
+        setError(`تعذر رفع "${file.name}": ${uploadError.message}`);
+        setUploading(false);
+        e.target.value = '';
+        return;
+      }
+
+      const { data } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filePath);
+
+      uploadedUrls.push(data.publicUrl);
     }
 
-    const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
-    setForm((prev) => ({ ...prev, image_url: data.publicUrl }));
+    setForm((prev) => {
+      const existing = normalizeImages(prev.image_url, prev.gallery);
+      const nextGallery = Array.from(new Set([...existing, ...uploadedUrls]));
+      const nextMain = prev.image_url.trim() || nextGallery[0] || '';
+
+      return {
+        ...prev,
+        image_url: nextMain,
+        gallery: nextGallery,
+      };
+    });
+
     setUploading(false);
+    e.target.value = '';
+  }
+
+  function makeMainImage(url: string) {
+    setForm((prev) => ({
+      ...prev,
+      image_url: url,
+      gallery: normalizeImages(url, prev.gallery),
+    }));
+  }
+
+  function removeImage(url: string) {
+    setForm((prev) => {
+      const nextGallery = prev.gallery.filter((img) => img !== url);
+      const nextMain =
+        prev.image_url === url
+          ? nextGallery[0] ?? ''
+          : prev.image_url;
+
+      return {
+        ...prev,
+        image_url: nextMain,
+        gallery: normalizeImages(nextMain, nextGallery),
+      };
+    });
   }
 
   async function handleSave(e: FormEvent) {
@@ -167,27 +250,35 @@ export default function AdminDashboardPage() {
 
     const price = Number(form.price);
     const oldPrice = form.old_price.trim() ? Number(form.old_price) : null;
+
     if (!form.name.trim()) {
       setError('اكتب اسم المنتج');
       return;
     }
+
     if (!Number.isFinite(price) || price < 0) {
       setError('أدخل سعرًا صحيحًا');
       return;
     }
+
     if (oldPrice !== null && (!Number.isFinite(oldPrice) || oldPrice < 0)) {
       setError('السعر القديم غير صحيح');
       return;
     }
 
+    const gallery = normalizeImages(form.image_url, form.gallery);
+    const mainImage = form.image_url.trim() || gallery[0] || '';
+
     setSaving(true);
+
     const payload = {
       name: form.name.trim(),
       description: form.description.trim(),
       price,
       old_price: oldPrice,
       category: form.category,
-      image_url: form.image_url.trim(),
+      image_url: mainImage,
+      gallery,
       available: form.available,
       visible: form.visible,
       updated_at: new Date().toISOString(),
@@ -198,6 +289,7 @@ export default function AdminDashboardPage() {
       : await supabase.from('products').insert(payload);
 
     setSaving(false);
+
     if (response.error) {
       setError(`تعذر حفظ المنتج: ${response.error.message}`);
       return;
@@ -206,33 +298,46 @@ export default function AdminDashboardPage() {
     setSuccess(editingId ? 'تم تعديل المنتج بنجاح' : 'تمت إضافة المنتج بنجاح');
     setShowForm(false);
     setEditingId(null);
-    setForm(EMPTY_FORM);
+    setForm({ ...EMPTY_FORM, gallery: [] });
     await fetchProducts();
   }
 
   async function handleDelete(product: AdminProduct) {
     if (!window.confirm(`هل تريد حذف «${product.name}» نهائيًا؟`)) return;
+
     setError('');
     setSuccess('');
-    const { error: deleteError } = await supabase.from('products').delete().eq('id', product.id);
+
+    const { error: deleteError } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', product.id);
+
     if (deleteError) {
       setError(`تعذر حذف المنتج: ${deleteError.message}`);
       return;
     }
+
     setSuccess('تم حذف المنتج');
     await fetchProducts();
   }
 
   async function toggleField(product: AdminProduct, field: 'available' | 'visible') {
     setError('');
+
     const { error: updateError } = await supabase
       .from('products')
-      .update({ [field]: !product[field], updated_at: new Date().toISOString() })
+      .update({
+        [field]: !product[field],
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', product.id);
+
     if (updateError) {
       setError(`تعذر تعديل المنتج: ${updateError.message}`);
       return;
     }
+
     await fetchProducts();
   }
 
@@ -242,129 +347,393 @@ export default function AdminDashboardPage() {
   }
 
   if (checkingAuth) {
-    return <div className="min-h-screen pt-28 text-center text-brown-400">جارٍ التحقق من تسجيل الدخول...</div>;
+    return (
+      <div className="min-h-screen pt-28 text-center text-brown-400">
+        جارٍ التحقق من تسجيل الدخول...
+      </div>
+    );
   }
-  if (!session) return <Navigate to="/admin/login" replace state={{ from: '/admin' }} />;
+
+  if (!session) {
+    return <Navigate to="/admin/login" replace state={{ from: '/admin' }} />;
+  }
+
+  const previewImages = normalizeImages(form.image_url, form.gallery);
 
   return (
     <div className="min-h-screen pt-20 pb-12 bg-cream-50">
       <div className="container-lux">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-brown-700">لوحة إدارة المنتجات</h1>
-            <p className="text-sm text-brown-400 mt-1">أضف المنتجات وعدّل الأسعار والتوفر من داخل الموقع</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-brown-700">
+              لوحة إدارة المنتجات
+            </h1>
+            <p className="text-sm text-brown-400 mt-1">
+              أضف المنتجات وعدّل الأسعار والتوفر من داخل الموقع
+            </p>
           </div>
+
           <div className="flex gap-2">
-            <button onClick={openAdd} className="btn-primary"><Plus size={18} /> إضافة منتج</button>
-            <button onClick={signOut} className="btn-outline"><LogOut size={18} /> خروج</button>
+            <button onClick={openAdd} className="btn-primary">
+              <Plus size={18} />
+              إضافة منتج
+            </button>
+
+            <button onClick={signOut} className="btn-outline">
+              <LogOut size={18} />
+              خروج
+            </button>
           </div>
         </div>
 
-        {error && <div className="mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-sm text-rose-500">{error}</div>}
-        {success && <div className="mb-4 rounded-xl bg-green-50 border border-green-200 p-3 text-sm text-green-700">{success}</div>}
+        {error && (
+          <div className="mb-4 rounded-xl bg-rose-50 border border-rose-200 p-3 text-sm text-rose-500">
+            {error}
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-4 rounded-xl bg-green-50 border border-green-200 p-3 text-sm text-green-700">
+            {success}
+          </div>
+        )}
 
         {showForm && (
-          <form onSubmit={handleSave} className="bg-white border border-beige-100 rounded-2xl p-5 sm:p-6 shadow-sm mb-6">
+          <form
+            onSubmit={handleSave}
+            className="bg-white border border-beige-100 rounded-2xl p-5 sm:p-6 shadow-sm mb-6"
+          >
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold text-brown-700">{editingId ? 'تعديل المنتج' : 'إضافة منتج جديد'}</h2>
-              <button type="button" onClick={() => setShowForm(false)} className="p-2 text-brown-400 hover:text-brown-700"><X size={20} /></button>
+              <h2 className="text-lg font-bold text-brown-700">
+                {editingId ? 'تعديل المنتج' : 'إضافة منتج جديد'}
+              </h2>
+
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="p-2 text-brown-400 hover:text-brown-700"
+              >
+                <X size={20} />
+              </button>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
                 <label className="label-lux">اسم المنتج *</label>
-                <input className="input-lux" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="مثال: بوكس ورد فاخر" />
+                <input
+                  className="input-lux"
+                  required
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="مثال: بوكس ورد فاخر"
+                />
               </div>
+
               <div>
                 <label className="label-lux">السعر الحالي *</label>
-                <input className="input-lux" type="number" min="0" step="0.01" required value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="150" />
+                <input
+                  className="input-lux"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  required
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                  placeholder="150"
+                />
               </div>
+
               <div>
                 <label className="label-lux">السعر القديم (اختياري)</label>
-                <input className="input-lux" type="number" min="0" step="0.01" value={form.old_price} onChange={(e) => setForm({ ...form, old_price: e.target.value })} placeholder="180" />
+                <input
+                  className="input-lux"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={form.old_price}
+                  onChange={(e) => setForm({ ...form, old_price: e.target.value })}
+                  placeholder="180"
+                />
               </div>
+
               <div>
                 <label className="label-lux">التصنيف</label>
-                <select className="input-lux" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                  {CATEGORIES.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                <select
+                  className="input-lux"
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value })}
+                >
+                  {CATEGORIES.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
               </div>
+
               <div>
-                <label className="label-lux">صورة المنتج</label>
+                <label className="label-lux">صور المنتج</label>
                 <label className="btn-outline w-full cursor-pointer">
-                  <Upload size={18} /> {uploading ? 'جارٍ رفع الصورة...' : 'اختر صورة من الجهاز'}
-                  <input type="file" accept="image/*" className="hidden" disabled={uploading} onChange={handleImageUpload} />
+                  <Upload size={18} />
+                  {uploading ? 'جارٍ رفع الصور...' : 'اختر صورة أو عدة صور'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={handleImageUpload}
+                  />
                 </label>
               </div>
+
               <div className="sm:col-span-2">
-                <label className="label-lux">أو رابط الصورة</label>
-                <input dir="ltr" className="input-lux text-left" value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://..." />
+                <label className="label-lux">رابط الصورة الرئيسية (اختياري)</label>
+                <input
+                  dir="ltr"
+                  className="input-lux text-left"
+                  value={form.image_url}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      image_url: e.target.value,
+                    })
+                  }
+                  placeholder="https://..."
+                />
               </div>
-              {form.image_url && (
+
+              {previewImages.length > 0 && (
                 <div className="sm:col-span-2">
-                  <img src={form.image_url} alt="معاينة المنتج" className="w-28 h-28 object-cover rounded-xl border border-beige-100" />
+                  <div className="flex items-center justify-between gap-3 mb-2">
+                    <label className="label-lux mb-0">
+                      صور المنتج ({previewImages.length})
+                    </label>
+                    <span className="text-xs text-brown-400">
+                      اضغط «اجعلها الرئيسية» لتغيير صورة الغلاف
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                    {previewImages.map((url) => {
+                      const isMain = form.image_url === url;
+
+                      return (
+                        <div
+                          key={url}
+                          className={`relative rounded-xl overflow-hidden border-2 bg-cream-50 ${
+                            isMain ? 'border-gold-400' : 'border-beige-100'
+                          }`}
+                        >
+                          <img
+                            src={url}
+                            alt="معاينة المنتج"
+                            className="w-full aspect-square object-cover"
+                          />
+
+                          {isMain && (
+                            <span className="absolute top-2 right-2 text-[11px] px-2 py-1 rounded-full bg-gold-400 text-brown-900 font-bold">
+                              الرئيسية
+                            </span>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => removeImage(url)}
+                            className="absolute top-2 left-2 w-8 h-8 rounded-full bg-white/90 text-rose-500 flex items-center justify-center shadow"
+                            aria-label="حذف الصورة"
+                          >
+                            <X size={16} />
+                          </button>
+
+                          {!isMain && (
+                            <button
+                              type="button"
+                              onClick={() => makeMainImage(url)}
+                              className="w-full px-2 py-2 text-xs font-medium text-brown-600 bg-white hover:bg-gold-50"
+                            >
+                              اجعلها الرئيسية
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
+
               <div className="sm:col-span-2">
                 <label className="label-lux">وصف المنتج</label>
-                <textarea className="input-lux resize-none" rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="اكتب وصف الهدية ومحتوياتها..." />
+                <textarea
+                  className="input-lux resize-none"
+                  rows={4}
+                  value={form.description}
+                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  placeholder="اكتب وصف الهدية ومحتوياتها..."
+                />
               </div>
+
               <label className="flex items-center gap-2 cursor-pointer bg-cream-50 rounded-xl p-3">
-                <input type="checkbox" className="accent-gold-500" checked={form.available} onChange={(e) => setForm({ ...form, available: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  className="accent-gold-500"
+                  checked={form.available}
+                  onChange={(e) => setForm({ ...form, available: e.target.checked })}
+                />
                 <span className="text-sm text-brown-600">متوفر في المخزون</span>
               </label>
+
               <label className="flex items-center gap-2 cursor-pointer bg-cream-50 rounded-xl p-3">
-                <input type="checkbox" className="accent-gold-500" checked={form.visible} onChange={(e) => setForm({ ...form, visible: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  className="accent-gold-500"
+                  checked={form.visible}
+                  onChange={(e) => setForm({ ...form, visible: e.target.checked })}
+                />
                 <span className="text-sm text-brown-600">ظاهر للزبائن</span>
               </label>
             </div>
 
             <div className="flex gap-2 mt-6">
-              <button type="submit" disabled={saving || uploading} className="btn-primary disabled:opacity-60"><Save size={18} /> {saving ? 'جارٍ الحفظ...' : 'حفظ المنتج'}</button>
-              <button type="button" onClick={() => setShowForm(false)} className="btn-outline">إلغاء</button>
+              <button
+                type="submit"
+                disabled={saving || uploading}
+                className="btn-primary disabled:opacity-60"
+              >
+                <Save size={18} />
+                {saving ? 'جارٍ الحفظ...' : 'حفظ المنتج'}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="btn-outline"
+              >
+                إلغاء
+              </button>
             </div>
           </form>
         )}
 
         <div className="bg-white border border-beige-100 rounded-2xl shadow-sm overflow-hidden">
           <div className="p-4 sm:p-5 border-b border-beige-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2 text-brown-700 font-bold"><Package size={19} /> المنتجات ({products.length})</div>
+            <div className="flex items-center gap-2 text-brown-700 font-bold">
+              <Package size={19} />
+              المنتجات ({products.length})
+            </div>
+
             <div className="relative sm:w-72">
-              <Search size={17} className="absolute right-3 top-1/2 -translate-y-1/2 text-brown-300" />
-              <input value={search} onChange={(e) => setSearch(e.target.value)} className="input-lux pr-9" placeholder="ابحث عن منتج..." />
+              <Search
+                size={17}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-brown-300"
+              />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="input-lux pr-9"
+                placeholder="ابحث عن منتج..."
+              />
             </div>
           </div>
 
           {loading ? (
-            <div className="p-10 text-center text-brown-400">جارٍ تحميل المنتجات...</div>
+            <div className="p-10 text-center text-brown-400">
+              جارٍ تحميل المنتجات...
+            </div>
           ) : filtered.length === 0 ? (
             <div className="p-10 text-center">
               <Package size={42} className="mx-auto text-beige-300 mb-3" />
               <p className="text-brown-500 font-medium">لا توجد منتجات بعد</p>
-              <button onClick={openAdd} className="mt-3 text-gold-600 font-medium">+ أضف أول منتج</button>
+              <button
+                onClick={openAdd}
+                className="mt-3 text-gold-600 font-medium"
+              >
+                + أضف أول منتج
+              </button>
             </div>
           ) : (
             <div className="divide-y divide-beige-100">
               {filtered.map((product) => (
-                <div key={product.id} className="p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div
+                  key={product.id}
+                  className="p-4 flex flex-col sm:flex-row sm:items-center gap-4"
+                >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
                     <div className="w-16 h-16 rounded-xl bg-cream-100 overflow-hidden shrink-0">
-                      {product.image_url ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" /> : <Package className="m-5 text-beige-300" size={24} />}
+                      {product.image_url ? (
+                        <img
+                          src={product.image_url}
+                          alt={product.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Package className="m-5 text-beige-300" size={24} />
+                      )}
                     </div>
+
                     <div className="min-w-0">
-                      <h3 className="font-bold text-brown-700 truncate">{product.name}</h3>
+                      <h3 className="font-bold text-brown-700 truncate">
+                        {product.name}
+                      </h3>
+
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span className="font-bold text-gold-600">{formatMoney(product.price)}</span>
-                        {product.old_price != null && <span className="text-xs text-brown-300 line-through">{formatMoney(product.old_price)}</span>}
+                        <span className="font-bold text-gold-600">
+                          {formatMoney(product.price)}
+                        </span>
+
+                        {product.old_price != null && (
+                          <span className="text-xs text-brown-300 line-through">
+                            {formatMoney(product.old_price)}
+                          </span>
+                        )}
+
+                        {Array.isArray(product.gallery) && product.gallery.length > 1 && (
+                          <span className="text-xs text-brown-400">
+                            {product.gallery.length} صور
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    <button onClick={() => toggleField(product, 'available')} className={`text-xs px-3 py-2 rounded-lg font-medium ${product.available ? 'bg-green-50 text-green-700' : 'bg-rose-50 text-rose-500'}`}>{product.available ? 'متوفر' : 'نفد'}</button>
-                    <button onClick={() => toggleField(product, 'visible')} className={`text-xs px-3 py-2 rounded-lg font-medium ${product.visible ? 'bg-gold-50 text-gold-700' : 'bg-gray-100 text-gray-500'}`}>{product.visible ? 'ظاهر' : 'مخفي'}</button>
-                    <button onClick={() => openEdit(product)} className="p-2.5 rounded-lg border border-beige-200 text-brown-500 hover:border-gold-300 hover:text-gold-600" aria-label="تعديل"><Pencil size={17} /></button>
-                    <button onClick={() => handleDelete(product)} className="p-2.5 rounded-lg border border-rose-100 text-rose-400 hover:bg-rose-50" aria-label="حذف"><Trash2 size={17} /></button>
+                    <button
+                      onClick={() => toggleField(product, 'available')}
+                      className={`text-xs px-3 py-2 rounded-lg font-medium ${
+                        product.available
+                          ? 'bg-green-50 text-green-700'
+                          : 'bg-rose-50 text-rose-500'
+                      }`}
+                    >
+                      {product.available ? 'متوفر' : 'نفد'}
+                    </button>
+
+                    <button
+                      onClick={() => toggleField(product, 'visible')}
+                      className={`text-xs px-3 py-2 rounded-lg font-medium ${
+                        product.visible
+                          ? 'bg-gold-50 text-gold-700'
+                          : 'bg-gray-100 text-gray-500'
+                      }`}
+                    >
+                      {product.visible ? 'ظاهر' : 'مخفي'}
+                    </button>
+
+                    <button
+                      onClick={() => openEdit(product)}
+                      className="p-2.5 rounded-lg border border-beige-200 text-brown-500 hover:border-gold-300 hover:text-gold-600"
+                      aria-label="تعديل"
+                    >
+                      <Pencil size={17} />
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(product)}
+                      className="p-2.5 rounded-lg border border-rose-100 text-rose-400 hover:bg-rose-50"
+                      aria-label="حذف"
+                    >
+                      <Trash2 size={17} />
+                    </button>
                   </div>
                 </div>
               ))}
