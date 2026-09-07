@@ -26,69 +26,83 @@ export function buildProductWhatsAppMessage(
   customization: ProductCustomization,
 ): string {
   const lines = [
-    'مرحبا، أريد طلب:',
+    '🛍️ طلب جديد من لمسة هدية',
+    '',
+    '🎁 المنتج',
     '',
     `اسم المنتج: ${product.name}`,
     `السعر: ${formatPrice(product.price)}`,
     `الكمية: ${quantity}`,
+    `💰 إجمالي الطلب: ${formatPrice(product.price * quantity)}`,
   ];
 
   if (customization.wrappingColor && customization.wrappingColor !== 'default') {
-    lines.push(`لون التغليف: ${customization.wrappingColor}`);
+    lines.push(`🎨 لون التغليف: ${customization.wrappingColor}`);
   }
   if (customization.recipientName) {
-    lines.push(`الاسم المخصص: ${customization.recipientName}`);
+    lines.push(`👤 الاسم المخصص: ${customization.recipientName}`);
   }
   if (customization.giftMessage) {
-    lines.push(`رسالة الإهداء: ${customization.giftMessage}`);
+    lines.push(`💌 رسالة الإهداء: ${customization.giftMessage}`);
   }
   if (customization.occasion) {
-    lines.push(`المناسبة: ${customization.occasion}`);
+    lines.push(`🎉 المناسبة: ${customization.occasion}`);
   }
   if (customization.notes) {
-    lines.push(`الملاحظات: ${customization.notes}`);
+    lines.push(`📝 الملاحظات: ${customization.notes}`);
   }
 
   return lines.join('\n');
 }
 
 export function buildCartWhatsAppMessage(items: CartItem[]): string {
-  const lines = ['مرحبا، أريد طلب المنتجات التالية:', ''];
+  const lines = [
+    '🛍️ طلب جديد من لمسة هدية',
+    '',
+    '🎁 المنتجات',
+    '',
+  ];
 
-  let subtotal = 0;
+  let total = 0;
+
   items.forEach((item, index) => {
-    const total = item.product.price * item.quantity;
-    subtotal += total;
+    const itemTotal = item.product.price * item.quantity;
+    total += itemTotal;
+
     lines.push(`${index + 1}. ${item.product.name}`);
-    lines.push(`   السعر: ${formatPrice(item.product.price)}`);
     lines.push(`   الكمية: ${item.quantity}`);
-    lines.push(`   الإجمالي: ${formatPrice(total)}`);
+    lines.push(`   السعر: ${formatPrice(item.product.price)}`);
+
+    if (item.quantity > 1) {
+      lines.push(`   إجمالي المنتج: ${formatPrice(itemTotal)}`);
+    }
+
     if (item.customization.wrappingColor && item.customization.wrappingColor !== 'default') {
-      lines.push(`   لون التغليف: ${item.customization.wrappingColor}`);
+      lines.push(`   🎨 لون التغليف: ${item.customization.wrappingColor}`);
     }
     if (item.customization.recipientName) {
-      lines.push(`   الاسم المخصص: ${item.customization.recipientName}`);
+      lines.push(`   👤 الاسم المخصص: ${item.customization.recipientName}`);
     }
     if (item.customization.giftMessage) {
-      lines.push(`   رسالة الإهداء: ${item.customization.giftMessage}`);
+      lines.push(`   💌 رسالة الإهداء: ${item.customization.giftMessage}`);
     }
     if (item.customization.occasion) {
-      lines.push(`   المناسبة: ${item.customization.occasion}`);
+      lines.push(`   🎉 المناسبة: ${item.customization.occasion}`);
     }
     if (item.customization.notes) {
-      lines.push(`   الملاحظات: ${item.customization.notes}`);
+      lines.push(`   📝 الملاحظات: ${item.customization.notes}`);
     }
+
     lines.push('');
   });
 
-  lines.push(`Subtotal: ${formatPrice(subtotal)}`);
-  lines.push(`Total: ${formatPrice(subtotal)}`);
+  lines.push(`💰 إجمالي الطلب: ${formatPrice(total)}`);
 
   return lines.join('\n');
 }
 
 export function buildCustomGiftWhatsAppMessage(data: Record<string, string>): string {
-  const lines = ['مرحبا، أريد تصميم هدية مخصصة:', ''];
+  const lines = ['🎁 طلب تصميم هدية مخصصة من لمسة هدية', ''];
 
   const labels: Record<string, string> = {
     giftType: 'نوع الهدية',
@@ -111,6 +125,11 @@ export function buildCustomGiftWhatsAppMessage(data: Record<string, string>): st
 
   return lines.join('\n');
 }
+
+export function buildContactWhatsAppMessage(name: string, message: string): string {
+  return `مرحبا، أنا ${name}.\n\n${message}`;
+}
+
 
 export function buildContactWhatsAppMessage(name: string, message: string): string {
   return `مرحبا، أنا ${name}.\n\n${message}`;
