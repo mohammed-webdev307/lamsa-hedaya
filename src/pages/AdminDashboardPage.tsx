@@ -9,11 +9,15 @@ interface AdminProduct {
   id: number;
   name: string;
   description: string | null;
+  short_description: string | null;
   price: number;
   old_price: number | null;
   category: string | null;
   image_url: string | null;
   gallery: string[] | null;
+  badge: string | null;
+  features: string[] | null;
+  occasions: string[] | null;
   available: boolean;
   visible: boolean;
   created_at?: string;
@@ -23,11 +27,15 @@ interface AdminProduct {
 interface ProductForm {
   name: string;
   description: string;
+  short_description: string;
   price: string;
   old_price: string;
   category: string;
   image_url: string;
   gallery: string[];
+  badge: string;
+  features: string;
+  occasions: string[];
   available: boolean;
   visible: boolean;
 }
@@ -35,11 +43,15 @@ interface ProductForm {
 const EMPTY_FORM: ProductForm = {
   name: '',
   description: '',
+  short_description: '',
   price: '',
   old_price: '',
   category: 'boxes',
   image_url: '',
   gallery: [],
+  badge: '',
+  features: '',
+  occasions: [],
   available: true,
   visible: true,
 };
@@ -93,7 +105,7 @@ export default function AdminDashboardPage() {
 
     const { data, error: fetchError } = await supabase
       .from('products')
-      .select('id,name,description,price,old_price,category,image_url,gallery,available,visible,created_at,updated_at')
+      .select('id,name,description,short_description,price,old_price,category,image_url,gallery,badge,features,occasions,available,visible,created_at,updated_at')
       .order('created_at', { ascending: false });
 
     if (fetchError) {
@@ -139,11 +151,15 @@ export default function AdminDashboardPage() {
     setForm({
       name: product.name,
       description: product.description ?? '',
+      short_description: product.short_description ?? '',
       price: String(product.price ?? ''),
       old_price: product.old_price == null ? '' : String(product.old_price),
       category: product.category ?? 'boxes',
       image_url: product.image_url ?? gallery[0] ?? '',
       gallery,
+      badge: product.badge ?? '',
+      features: Array.isArray(product.features) ? product.features.join('\n') : '',
+      occasions: Array.isArray(product.occasions) ? product.occasions : [],
       available: product.available,
       visible: product.visible,
     });
@@ -274,11 +290,18 @@ export default function AdminDashboardPage() {
     const payload = {
       name: form.name.trim(),
       description: form.description.trim(),
+      short_description: form.short_description.trim(),
       price,
       old_price: oldPrice,
       category: form.category,
       image_url: mainImage,
       gallery,
+      badge: form.badge || null,
+      features: form.features
+        .split('\n')
+        .map((item) => item.trim())
+        .filter(Boolean),
+      occasions: form.occasions,
       available: form.available,
       visible: form.visible,
       updated_at: new Date().toISOString(),
@@ -561,6 +584,77 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
               )}
+
+              <div className="sm:col-span-2">
+                <label className="label-lux">الوصف المختصر</label>
+                <input
+                  className="input-lux"
+                  value={form.short_description}
+                  onChange={(e) => setForm({ ...form, short_description: e.target.value })}
+                  placeholder="مثال: بوكس ورد فاخر مع شوكولاتة وبطاقة إهداء"
+                />
+              </div>
+
+              <div>
+                <label className="label-lux">الشارة</label>
+                <select
+                  className="input-lux"
+                  value={form.badge}
+                  onChange={(e) => setForm({ ...form, badge: e.target.value })}
+                >
+                  <option value="">بدون شارة</option>
+                  <option value="new">جديد</option>
+                  <option value="bestseller">الأكثر طلبًا</option>
+                  <option value="sale">تخفيض</option>
+                </select>
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="label-lux">المميزات</label>
+                <textarea
+                  className="input-lux resize-none"
+                  rows={4}
+                  value={form.features}
+                  onChange={(e) => setForm({ ...form, features: e.target.value })}
+                  placeholder={"اكتب كل ميزة في سطر منفصل\nتغليف فاخر\nبطاقة إهداء مجانية\nتوصيل سريع"}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label className="label-lux">المناسبات</label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {[
+                    ['birthday', 'عيد ميلاد'],
+                    ['anniversary', 'ذكرى سنوية'],
+                    ['wedding', 'زفاف'],
+                    ['engagement', 'خطوبة'],
+                    ['graduation', 'تخرج'],
+                    ['thanks', 'شكر'],
+                    ['apology', 'اعتذار'],
+                    ['surprise', 'مفاجأة'],
+                  ].map(([value, label]) => (
+                    <label
+                      key={value}
+                      className="flex items-center gap-2 cursor-pointer bg-cream-50 rounded-xl p-3"
+                    >
+                      <input
+                        type="checkbox"
+                        className="accent-gold-500"
+                        checked={form.occasions.includes(value)}
+                        onChange={(e) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            occasions: e.target.checked
+                              ? Array.from(new Set([...prev.occasions, value]))
+                              : prev.occasions.filter((item) => item !== value),
+                          }))
+                        }
+                      />
+                      <span className="text-sm text-brown-600">{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
 
               <div className="sm:col-span-2">
                 <label className="label-lux">وصف المنتج</label>
