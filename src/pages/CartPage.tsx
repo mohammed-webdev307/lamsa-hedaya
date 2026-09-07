@@ -10,6 +10,9 @@ export default function CartPage() {
 
   const [locationUrl, setLocationUrl] = useState('');
   const [locationStatus, setLocationStatus] = useState('');
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [orderNotes, setOrderNotes] = useState('');
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -40,8 +43,20 @@ export default function CartPage() {
   const handleWhatsAppOrder = () => {
     let message = buildCartWhatsAppMessage(cart);
 
+    if (customerName.trim()) {
+      message += `\n\n👤 اسم الزبون: ${customerName.trim()}`;
+    }
+
+    if (customerPhone.trim()) {
+      message += `\n📞 رقم الهاتف: ${customerPhone.trim()}`;
+    }
+
     if (locationUrl) {
-      message += `\n\n📍 موقع التوصيل:\n${locationUrl}`;
+      message += `\n📍 موقع التوصيل:\n${locationUrl}`;
+    }
+
+    if (orderNotes.trim()) {
+      message += `\n📝 ملاحظات الطلب: ${orderNotes.trim()}`;
     }
 
     window.open(buildWhatsAppUrl(message), '_blank');
@@ -190,7 +205,33 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <div className="mt-5">
+              <div className="mt-5 space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-brown-600 mb-1">
+                    اسم الزبون
+                  </label>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="اكتب اسمك"
+                    className="w-full border border-beige-200 rounded-xl px-4 py-3 text-brown-700 outline-none focus:border-gold-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-brown-600 mb-1">
+                    رقم الهاتف
+                  </label>
+                  <input
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    placeholder="مثال: 059xxxxxxx"
+                    className="w-full border border-beige-200 rounded-xl px-4 py-3 text-brown-700 outline-none focus:border-gold-400"
+                  />
+                </div>
+
                 <button
                   type="button"
                   onClick={handleGetLocation}
@@ -205,6 +246,19 @@ export default function CartPage() {
                     {locationStatus}
                   </p>
                 )}
+
+                <div>
+                  <label className="block text-sm font-medium text-brown-600 mb-1">
+                    ملاحظات الطلب
+                  </label>
+                  <textarea
+                    value={orderNotes}
+                    onChange={(e) => setOrderNotes(e.target.value)}
+                    placeholder="مثال: وقت التوصيل أو أي تفاصيل إضافية"
+                    rows={3}
+                    className="w-full border border-beige-200 rounded-xl px-4 py-3 text-brown-700 outline-none focus:border-gold-400 resize-none"
+                  />
+                </div>
               </div>
 
               <button onClick={handleWhatsAppOrder} className="btn-whatsapp w-full mt-4">
