@@ -130,7 +130,3 @@ export function buildContactWhatsAppMessage(name: string, message: string): stri
   return `مرحبا، أنا ${name}.\n\n${message}`;
 }
 
-
-export function buildContactWhatsAppMessage(name: string, message: string): string {
-  return `مرحبا، أنا ${name}.\n\n${message}`;
-}
