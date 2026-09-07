@@ -1,15 +1,49 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Minus, Plus, ShoppingBag, Trash2, MessageCircle, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Minus, Plus, ShoppingBag, Trash2, MessageCircle, ArrowLeft, MapPin } from 'lucide-react';
 import { useStore } from '@/store/StoreContext';
 import { formatPrice, buildWhatsAppUrl, buildCartWhatsAppMessage } from '@/utils/whatsapp';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function CartPage() {
   const { cart, removeFromCart, updateCartQuantity, cartTotal, clearCart } = useStore();
-  const navigate = useNavigate();
+
+  const [locationUrl, setLocationUrl] = useState('');
+  const [locationStatus, setLocationStatus] = useState('');
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationStatus('المتصفح لا يدعم تحديد الموقع');
+      return;
+    }
+
+    setLocationStatus('جاري تحديد موقعك...');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const url = `https://www.google.com/maps?q=${latitude},${longitude}`;
+        setLocationUrl(url);
+        setLocationStatus('تم تحديد موقعك بنجاح ✅');
+      },
+      () => {
+        setLocationStatus('تعذر تحديد الموقع، تأكد من السماح بالوصول للموقع');
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  };
 
   const handleWhatsAppOrder = () => {
-    const message = buildCartWhatsAppMessage(cart);
+    let message = buildCartWhatsAppMessage(cart);
+
+    if (locationUrl) {
+      message += `\n\n📍 موقع التوصيل:\n${locationUrl}`;
+    }
+
     window.open(buildWhatsAppUrl(message), '_blank');
   };
 
@@ -156,7 +190,24 @@ export default function CartPage() {
                 </div>
               </div>
 
-              <button onClick={handleWhatsAppOrder} className="btn-whatsapp w-full mt-6">
+              <div className="mt-5">
+                <button
+                  type="button"
+                  onClick={handleGetLocation}
+                  className="w-full border border-beige-200 rounded-xl py-3 flex items-center justify-center gap-2 text-brown-600 hover:bg-cream-100 transition-all"
+                >
+                  <MapPin size={18} />
+                  {locationUrl ? 'تحديث موقع التوصيل' : 'تحديد موقع التوصيل'}
+                </button>
+
+                {locationStatus && (
+                  <p className="text-xs text-brown-400 text-center mt-2">
+                    {locationStatus}
+                  </p>
+                )}
+              </div>
+
+              <button onClick={handleWhatsAppOrder} className="btn-whatsapp w-full mt-4">
                 <MessageCircle size={18} />
                 إرسال الطلب عبر واتساب
               </button>
@@ -168,6 +219,10 @@ export default function CartPage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
     </div>
   );
 }
