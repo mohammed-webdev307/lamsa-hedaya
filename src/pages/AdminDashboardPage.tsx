@@ -88,6 +88,7 @@ export default function AdminDashboardPage() {
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingHero, setUploadingHero] = useState(false);
   const [showStoreSettings, setShowStoreSettings] = useState(false);
   const [showHomeSettings, setShowHomeSettings] = useState(false);
   const [savingStoreSettings, setSavingStoreSettings] = useState(false);
@@ -244,6 +245,46 @@ export default function AdminDashboardPage() {
     });
 
     setUploading(false);
+    e.target.value = '';
+  }
+
+  async function handleHeroImageUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setError(`الملف "${file.name}" ليس صورة`);
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError(`الصورة "${file.name}" أكبر من 5 ميجابايت`);
+      e.target.value = '';
+      return;
+    }
+
+    setUploadingHero(true);
+    setError('');
+
+    const extension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+    const fileName = `${crypto.randomUUID()}.${extension}`;
+    const filePath = `homepage/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+    if (uploadError) {
+      setError(`تعذر رفع الصورة: ${uploadError.message}`);
+      setUploadingHero(false);
+      e.target.value = '';
+      return;
+    }
+
+    const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
+    setSettingsForm((prev) => ({ ...prev, heroImage: data.publicUrl }));
+    setUploadingHero(false);
     e.target.value = '';
   }
 
@@ -505,7 +546,20 @@ export default function AdminDashboardPage() {
               <div><label className="label-lux">الشارة أعلى العنوان</label><input className="input-lux" value={settingsForm.heroBadge} onChange={(e) => setSettingsForm({ ...settingsForm, heroBadge: e.target.value })} /></div>
               <div><label className="label-lux">العنوان الرئيسي</label><input className="input-lux" value={settingsForm.heroTitle} onChange={(e) => setSettingsForm({ ...settingsForm, heroTitle: e.target.value })} /></div>
               <div className="sm:col-span-2"><label className="label-lux">الوصف الرئيسي</label><textarea rows={3} className="input-lux resize-none" value={settingsForm.heroDescription} onChange={(e) => setSettingsForm({ ...settingsForm, heroDescription: e.target.value })} /></div>
-              <div className="sm:col-span-2"><label className="label-lux">رابط صورة الغلاف</label><input dir="ltr" className="input-lux text-left" value={settingsForm.heroImage} onChange={(e) => setSettingsForm({ ...settingsForm, heroImage: e.target.value })} placeholder="https://..." /></div>
+              <div className="sm:col-span-2">
+                <label className="label-lux">صورة الغلاف</label>
+                <label className="mt-1 flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-beige-200 bg-beige-50 p-4 text-center hover:bg-beige-100">
+                  <Upload size={22} />
+                  <span className="text-sm font-medium text-brown-600">{uploadingHero ? 'جارٍ رفع الصورة...' : 'اختر صورة من الجهاز'}</span>
+                  <span className="text-xs text-brown-400">JPG أو PNG أو WEBP — بحد أقصى 5 MB</span>
+                  <input type="file" accept="image/*" className="hidden" onChange={handleHeroImageUpload} disabled={uploadingHero} />
+                </label>
+                {settingsForm.heroImage && (
+                  <div className="mt-3 overflow-hidden rounded-xl border border-beige-100">
+                    <img src={settingsForm.heroImage} alt="صورة الغلاف" className="h-40 w-full object-cover" />
+                  </div>
+                )}
+              </div>
             </div>
 
             <h3 className="font-bold text-brown-700 mt-6 mb-3">إظهار وإخفاء أقسام الصفحة</h3>
