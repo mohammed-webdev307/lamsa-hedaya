@@ -74,7 +74,7 @@ export default function HomePage() {
   return (
     <div className="pt-14 sm:pt-16">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-bl from-cream-100 via-cream-50 to-beige-100">
+      <section className="theme-hero relative overflow-hidden bg-gradient-to-bl from-cream-100 via-cream-50 to-beige-100">
         <div className="container-lux py-8 sm:py-14 lg:py-24">
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center">
             {/* Text */}

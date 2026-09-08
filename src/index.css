@@ -79,6 +79,46 @@
   }
 }
 
+/* Storefront theme surfaces: make the selected preset affect the actual page,
+   while preserving white product cards for readability. */
+.site-theme {
+  background-color: var(--theme-background);
+  color: var(--theme-text);
+}
+
+.site-theme main {
+  background-color: var(--theme-background);
+}
+
+.site-theme .bg-cream-50,
+.site-theme .bg-cream-100,
+.site-theme .bg-beige-50,
+.site-theme .bg-beige-100 {
+  background-color: var(--theme-soft) !important;
+}
+
+.site-theme .border-beige-100,
+.site-theme .border-beige-200 {
+  border-color: var(--theme-border) !important;
+}
+
+.site-theme .theme-hero {
+  background-image: linear-gradient(225deg, var(--theme-soft), var(--theme-background), color-mix(in srgb, var(--brand-primary) 14%, white)) !important;
+}
+
+.site-theme .btn-primary {
+  background-color: var(--brand-primary) !important;
+}
+
+.site-theme .btn-outline {
+  border-color: var(--brand-primary) !important;
+  color: var(--brand-primary) !important;
+}
+
+.site-theme .section-title {
+  color: var(--theme-text);
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

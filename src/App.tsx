@@ -26,7 +26,7 @@ function App() {
       <StoreProvider>
         <BrowserRouter>
         <ScrollToTopOnNavigate />
-        <div className="flex flex-col min-h-screen">
+        <div className="site-theme flex flex-col min-h-screen">
           <Header />
           <main className="flex-1">
             <Routes>
