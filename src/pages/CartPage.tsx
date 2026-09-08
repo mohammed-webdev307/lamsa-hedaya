@@ -4,6 +4,7 @@ import { Minus, Plus, ShoppingBag, Trash2, MessageCircle, ArrowLeft, MapPin } fr
 import { useStore } from '@/store/StoreContext';
 import { formatPrice, buildWhatsAppUrl, buildCartWhatsAppMessage } from '@/utils/whatsapp';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { getCurrentLanguage } from '@/lib/language';
 
 export default function CartPage() {
   const { cart, removeFromCart, updateCartQuantity, cartTotal, clearCart } = useStore();
@@ -42,21 +43,42 @@ export default function CartPage() {
 
   const handleWhatsAppOrder = () => {
     let message = buildCartWhatsAppMessage(cart);
+    const isEnglish = getCurrentLanguage() === 'en';
 
     if (customerName.trim()) {
-      message += `\n\n👤 اسم الزبون: ${customerName.trim()}`;
+      message += isEnglish
+        ? `
+
+👤 Customer name: ${customerName.trim()}`
+        : `
+
+👤 اسم الزبون: ${customerName.trim()}`;
     }
 
     if (customerPhone.trim()) {
-      message += `\n📞 رقم الهاتف: ${customerPhone.trim()}`;
+      message += isEnglish
+        ? `
+📞 Phone number: ${customerPhone.trim()}`
+        : `
+📞 رقم الهاتف: ${customerPhone.trim()}`;
     }
 
     if (locationUrl) {
-      message += `\n📍 موقع التوصيل:\n${locationUrl}`;
+      message += isEnglish
+        ? `
+📍 Delivery location:
+${locationUrl}`
+        : `
+📍 موقع التوصيل:
+${locationUrl}`;
     }
 
     if (orderNotes.trim()) {
-      message += `\n📝 ملاحظات الطلب: ${orderNotes.trim()}`;
+      message += isEnglish
+        ? `
+📝 Order notes: ${orderNotes.trim()}`
+        : `
+📝 ملاحظات الطلب: ${orderNotes.trim()}`;
     }
 
     window.open(buildWhatsAppUrl(message), '_blank');

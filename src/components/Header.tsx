@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Heart, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import { useStore } from '@/store/StoreContext';
 import { STORE_CONFIG } from '@/data/store';
+import { useLanguage } from '@/lib/language';
 
 const NAV_LINKS = [
   { to: '/', label: 'الرئيسية' },
@@ -15,6 +16,7 @@ const NAV_LINKS = [
 
 export default function Header() {
   const { cartCount, wishlist } = useStore();
+  const { language, toggleLanguage } = useLanguage();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -83,6 +85,14 @@ export default function Header() {
 
             {/* Actions */}
             <div className="flex items-center gap-1 sm:gap-2">
+              <button
+                onClick={toggleLanguage}
+                className="h-10 px-3 flex items-center justify-center text-sm font-bold text-brown-600 hover:text-gold-500 hover:bg-cream-100 rounded-lg transition-all border border-beige-200"
+                aria-label={language === 'ar' ? 'Switch to English' : 'التبديل إلى العربية'}
+                title={language === 'ar' ? 'English' : 'العربية'}
+              >
+                {language === 'ar' ? 'EN' : 'AR'}
+              </button>
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
                 className="w-10 h-10 flex items-center justify-center text-brown-600 hover:text-gold-500 hover:bg-cream-100 rounded-lg transition-all"

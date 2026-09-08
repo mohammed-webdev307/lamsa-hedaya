@@ -1,5 +1,6 @@
 import { STORE_CONFIG } from '@/data/store';
 import type { CartItem, Product, ProductCustomization } from '@/types';
+import { getCurrentLanguage, translateText } from '@/lib/language';
 
 export function formatPrice(price: number): string {
   return `${price.toLocaleString('en-US')} ${STORE_CONFIG.currency}`;
@@ -52,7 +53,7 @@ export function buildProductWhatsAppMessage(
     lines.push(`📝 الملاحظات: ${customization.notes}`);
   }
 
-  return lines.join('\n');
+  return (getCurrentLanguage() === 'en' ? lines.map(translateText) : lines).join('\n');
 }
 
 export function buildCartWhatsAppMessage(items: CartItem[]): string {
@@ -98,7 +99,7 @@ export function buildCartWhatsAppMessage(items: CartItem[]): string {
 
   lines.push(`💰 إجمالي الطلب: ${formatPrice(total)}`);
 
-  return lines.join('\n');
+  return (getCurrentLanguage() === 'en' ? lines.map(translateText) : lines).join('\n');
 }
 
 export function buildCustomGiftWhatsAppMessage(data: Record<string, string>): string {
@@ -123,10 +124,10 @@ export function buildCustomGiftWhatsAppMessage(data: Record<string, string>): st
     }
   });
 
-  return lines.join('\n');
+  return (getCurrentLanguage() === 'en' ? lines.map(translateText) : lines).join('\n');
 }
 
 export function buildContactWhatsAppMessage(name: string, message: string): string {
-  return `مرحبا، أنا ${name}.\n\n${message}`;
+  return getCurrentLanguage() === 'en' ? `Hello, I’m ${name}.\n\n${message}` : `مرحبا، أنا ${name}.\n\n${message}`;
 }
 
