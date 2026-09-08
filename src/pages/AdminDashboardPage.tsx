@@ -667,24 +667,32 @@ export default function AdminDashboardPage() {
                 )}
               </div>
               <div className="sm:col-span-2">
-                <label className="label-lux">اللون الرئيسي للموقع</label>
-                <div className="flex items-center gap-3">
-                  <input
-                    type="color"
-                    aria-label="اللون الرئيسي للموقع"
-                    value={settingsForm.primaryColor || '#8B6B3E'}
-                    onChange={(e) => setSettingsForm({ ...settingsForm, primaryColor: e.target.value })}
-                    className="h-12 w-16 cursor-pointer rounded-lg border border-beige-200 bg-white p-1"
-                  />
-                  <input
-                    dir="ltr"
-                    className="input-lux max-w-40 text-left"
-                    value={settingsForm.primaryColor || '#8B6B3E'}
-                    onChange={(e) => setSettingsForm({ ...settingsForm, primaryColor: e.target.value })}
-                    placeholder="#8B6B3E"
-                    maxLength={7}
-                  />
-                  <span className="text-sm text-brown-400">اختر لون هوية المتجر</span>
+                <label className="label-lux">ثيم ألوان الموقع</label>
+                <p className="mb-3 text-sm text-brown-400">اختر ثيمًا جاهزًا لتتناسق الخلفية والأزرار تلقائيًا</p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {[
+                    { name: 'وردي', color: '#C85C7A', background: '#FFF7F9' },
+                    { name: 'بيج وبني', color: '#8B654E', background: '#FAF6F0' },
+                    { name: 'أخضر', color: '#527A62', background: '#F4F8F5' },
+                    { name: 'أزرق', color: '#47759B', background: '#F4F8FC' },
+                  ].map((theme) => {
+                    const selected = (settingsForm.primaryColor || '#8B654E').toUpperCase() === theme.color;
+                    return (
+                      <button
+                        key={theme.color}
+                        type="button"
+                        onClick={() => setSettingsForm({ ...settingsForm, primaryColor: theme.color })}
+                        className={`rounded-xl border-2 p-3 text-start transition ${selected ? 'border-brown-700 shadow-sm' : 'border-beige-100 hover:border-beige-300'}`}
+                        aria-label={theme.name}
+                      >
+                        <div className="mb-2 flex items-center gap-2">
+                          <span className="h-8 w-8 rounded-full border border-black/5" style={{ backgroundColor: theme.color }} />
+                          <span className="h-8 flex-1 rounded-lg border border-black/5" style={{ backgroundColor: theme.background }} />
+                        </div>
+                        <span className="text-sm font-medium text-brown-700">{theme.name}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               <div>

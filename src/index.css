@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 :root {
-  --brand-primary: #8B6B3E;
+  --brand-primary: #8B654E;
+  --theme-background: #FAF6F0;
+  --theme-soft: #F3EADF;
+  --theme-text: #4A3820;
+  --theme-border: #E7D8C8;
 }
 
 @layer base {
@@ -18,8 +22,8 @@
 
   body {
     font-family: 'Tajawal', sans-serif;
-    background-color: #FBF9F4;
-    color: #4A3820;
+    background-color: var(--theme-background);
+    color: var(--theme-text);
     overflow-x: hidden;
   }
 
@@ -143,3 +147,10 @@
 .bg-gold-400, .bg-gold-500 { background-color: var(--brand-primary) !important; }
 .border-gold-400 { border-color: var(--brand-primary) !important; }
 .text-gold-500, .text-gold-600 { color: var(--brand-primary) !important; }
+
+
+/* Coordinated store theme: background + accents follow the selected preset */
+.bg-cream-50 { background-color: var(--theme-background) !important; }
+.bg-cream-100, .bg-beige-50 { background-color: var(--theme-soft) !important; }
+.border-beige-100, .border-beige-200 { border-color: var(--theme-border) !important; }
+.text-brown-700, .text-brown-900 { color: var(--theme-text) !important; }

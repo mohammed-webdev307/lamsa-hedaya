@@ -30,7 +30,25 @@ export function StoreSettingsProvider({ children }: { children: React.ReactNode 
   }, []);
 
   useEffect(() => {
-    document.documentElement.style.setProperty('--brand-primary', settings.primaryColor || DEFAULT_STORE_SETTINGS.primaryColor);
+    const primary = settings.primaryColor || DEFAULT_STORE_SETTINGS.primaryColor;
+    const palettes: Record<string, { background: string; soft: string; text: string; border: string }> = {
+      '#C85C7A': { background: '#FFF7F9', soft: '#FCEEF2', text: '#5B3341', border: '#F2D7DF' },
+      '#8B654E': { background: '#FAF6F0', soft: '#F3EADF', text: '#4A3820', border: '#E7D8C8' },
+      '#527A62': { background: '#F4F8F5', soft: '#EAF2EC', text: '#30483A', border: '#D6E5DA' },
+      '#47759B': { background: '#F4F8FC', soft: '#EAF1F7', text: '#2E475C', border: '#D5E2ED' },
+    };
+    const palette = palettes[primary.toUpperCase()] || {
+      background: `color-mix(in srgb, ${primary} 6%, white)`,
+      soft: `color-mix(in srgb, ${primary} 11%, white)`,
+      text: `color-mix(in srgb, ${primary} 55%, black)`,
+      border: `color-mix(in srgb, ${primary} 22%, white)`,
+    };
+
+    document.documentElement.style.setProperty('--brand-primary', primary);
+    document.documentElement.style.setProperty('--theme-background', palette.background);
+    document.documentElement.style.setProperty('--theme-soft', palette.soft);
+    document.documentElement.style.setProperty('--theme-text', palette.text);
+    document.documentElement.style.setProperty('--theme-border', palette.border);
   }, [settings.primaryColor]);
 
   const value = useMemo(() => ({ settings, loading, refresh }), [settings, loading]);

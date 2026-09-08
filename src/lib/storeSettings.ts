@@ -33,7 +33,7 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   name: STORE_CONFIG.name,
   tagline: STORE_CONFIG.tagline,
   logoUrl: '',
-  primaryColor: '#8B6B3E',
+  primaryColor: '#8B654E',
   currency: STORE_CONFIG.currency,
   currencyName: STORE_CONFIG.currencyName,
   whatsappNumber: STORE_CONFIG.whatsappNumber,
