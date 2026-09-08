@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { StoreProvider } from '@/store/StoreContext';
+import { StoreSettingsProvider } from '@/store/StoreSettingsContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import FloatingWhatsApp from '@/components/FloatingWhatsApp';
@@ -21,8 +22,9 @@ import AdminDashboardPage from '@/pages/AdminDashboardPage';
 
 function App() {
   return (
-    <StoreProvider>
-      <BrowserRouter>
+    <StoreSettingsProvider>
+      <StoreProvider>
+        <BrowserRouter>
         <ScrollToTopOnNavigate />
         <div className="flex flex-col min-h-screen">
           <Header />
@@ -47,8 +49,9 @@ function App() {
         <FloatingWhatsApp />
         <ToastContainer />
         <ScrollToTop />
-      </BrowserRouter>
-    </StoreProvider>
+        </BrowserRouter>
+      </StoreProvider>
+    </StoreSettingsProvider>
   );
 }
 

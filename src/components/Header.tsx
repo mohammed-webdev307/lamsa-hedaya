@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Heart, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import { useStore } from '@/store/StoreContext';
-import { STORE_CONFIG } from '@/data/store';
 import { useLanguage } from '@/lib/language';
+import { useStoreSettings } from '@/store/StoreSettingsContext';
 
 const NAV_LINKS = [
   { to: '/', label: 'الرئيسية' },
@@ -17,6 +17,7 @@ const NAV_LINKS = [
 export default function Header() {
   const { cartCount, wishlist } = useStore();
   const { language, toggleLanguage } = useLanguage();
+  const { settings } = useStoreSettings();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -60,8 +61,8 @@ export default function Header() {
                 <span className="text-cream-50 font-bold text-lg">ل</span>
               </div>
               <div className="hidden sm:block">
-                <h1 className="font-bold text-brown-700 text-lg leading-tight">{STORE_CONFIG.name}</h1>
-                <p className="text-xs text-brown-400 leading-tight">{STORE_CONFIG.tagline}</p>
+                <h1 className="font-bold text-brown-700 text-lg leading-tight">{settings.name}</h1>
+                <p className="text-xs text-brown-400 leading-tight">{settings.tagline}</p>
               </div>
             </Link>
 
@@ -173,7 +174,7 @@ export default function Header() {
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold-400 to-brown-500 flex items-center justify-center">
                   <span className="text-cream-50 font-bold">ل</span>
                 </div>
-                <span className="font-bold text-brown-700">{STORE_CONFIG.name}</span>
+                <span className="font-bold text-brown-700">{settings.name}</span>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}

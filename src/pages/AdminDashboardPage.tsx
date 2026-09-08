@@ -1,9 +1,11 @@
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Pencil, Trash2, Package, X, Upload, Save, Search } from 'lucide-react';
+import { LogOut, Plus, Pencil, Trash2, Package, X, Upload, Save, Search, Settings } from 'lucide-react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { CATEGORIES } from '@/data/store';
+import { saveStoreSettings, type StoreSettings } from '@/lib/storeSettings';
+import { useStoreSettings } from '@/store/StoreSettingsContext';
 
 interface AdminProduct {
   id: number;
@@ -73,6 +75,7 @@ function normalizeImages(imageUrl: string, gallery: string[]) {
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate();
+  const { settings, refresh: refreshStoreSettings } = useStoreSettings();
   const [session, setSession] = useState<Session | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [products, setProducts] = useState<AdminProduct[]>([]);
@@ -85,6 +88,14 @@ export default function AdminDashboardPage() {
   const [form, setForm] = useState<ProductForm>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showStoreSettings, setShowStoreSettings] = useState(false);
+  const [savingStoreSettings, setSavingStoreSettings] = useState(false);
+  const [settingsForm, setSettingsForm] = useState<StoreSettings>(settings);
+
+  useEffect(() => {
+    setSettingsForm(settings);
+  }, [settings]);
+
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -364,6 +375,35 @@ export default function AdminDashboardPage() {
     await fetchProducts();
   }
 
+  async function handleStoreSettingsSave(e: FormEvent) {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!settingsForm.name.trim()) {
+      setError('اكتب اسم المتجر');
+      return;
+    }
+    if (!settingsForm.whatsappNumber.replace(/[^0-9]/g, '')) {
+      setError('اكتب رقم واتساب صحيحًا');
+      return;
+    }
+
+    setSavingStoreSettings(true);
+    const { error: settingsError } = await saveStoreSettings(settingsForm);
+    setSavingStoreSettings(false);
+
+    if (settingsError) {
+      setError(`تعذر حفظ إعدادات المتجر: ${settingsError.message}. تأكد من تشغيل ملف migration الخاص بإعدادات المتجر في Supabase.`);
+      return;
+    }
+
+    await refreshStoreSettings();
+    setSuccess('تم حفظ إعدادات المتجر بنجاح');
+    setShowStoreSettings(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   async function signOut() {
     await supabase.auth.signOut();
     navigate('/admin/login', { replace: true });
@@ -396,7 +436,19 @@ export default function AdminDashboardPage() {
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() => {
+                setSettingsForm(settings);
+                setShowStoreSettings((prev) => !prev);
+                setShowForm(false);
+              }}
+              className="btn-outline"
+            >
+              <Settings size={18} />
+              إعدادات المتجر
+            </button>
+
             <button onClick={openAdd} className="btn-primary">
               <Plus size={18} />
               إضافة منتج
@@ -419,6 +471,91 @@ export default function AdminDashboardPage() {
           <div className="mb-4 rounded-xl bg-green-50 border border-green-200 p-3 text-sm text-green-700">
             {success}
           </div>
+        )}
+
+        {showStoreSettings && (
+          <form
+            onSubmit={handleStoreSettingsSave}
+            className="bg-white border border-beige-100 rounded-2xl shadow-sm p-4 sm:p-6 mb-6"
+          >
+            <div className="flex items-center justify-between gap-3 mb-5">
+              <div>
+                <h2 className="font-bold text-brown-700 text-xl flex items-center gap-2">
+                  <Settings size={20} />
+                  إعدادات المتجر
+                </h2>
+                <p className="text-sm text-brown-400 mt-1">
+                  غيّر بيانات المتجر التي تظهر للزبائن بدون تعديل الكود
+                </p>
+              </div>
+              <button type="button" onClick={() => setShowStoreSettings(false)} className="p-2 text-brown-400">
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="label-lux">اسم المتجر</label>
+                <input className="input-lux" value={settingsForm.name} onChange={(e) => setSettingsForm({ ...settingsForm, name: e.target.value })} />
+              </div>
+              <div>
+                <label className="label-lux">الشعار النصي</label>
+                <input className="input-lux" value={settingsForm.tagline} onChange={(e) => setSettingsForm({ ...settingsForm, tagline: e.target.value })} />
+              </div>
+              <div>
+                <label className="label-lux">رقم واتساب</label>
+                <input dir="ltr" className="input-lux text-left" value={settingsForm.whatsappNumber} onChange={(e) => setSettingsForm({ ...settingsForm, whatsappNumber: e.target.value })} placeholder="974XXXXXXXX" />
+              </div>
+              <div>
+                <label className="label-lux">رقم الهاتف</label>
+                <input dir="ltr" className="input-lux text-left" value={settingsForm.phone} onChange={(e) => setSettingsForm({ ...settingsForm, phone: e.target.value })} />
+              </div>
+              <div>
+                <label className="label-lux">البريد الإلكتروني</label>
+                <input dir="ltr" type="email" className="input-lux text-left" value={settingsForm.email} onChange={(e) => setSettingsForm({ ...settingsForm, email: e.target.value })} />
+              </div>
+              <div>
+                <label className="label-lux">اسم إنستغرام</label>
+                <input dir="ltr" className="input-lux text-left" value={settingsForm.instagram} onChange={(e) => setSettingsForm({ ...settingsForm, instagram: e.target.value })} placeholder="lamsahadiya" />
+              </div>
+              <div>
+                <label className="label-lux">رابط إنستغرام</label>
+                <input dir="ltr" className="input-lux text-left" value={settingsForm.instagramUrl} onChange={(e) => setSettingsForm({ ...settingsForm, instagramUrl: e.target.value })} placeholder="https://instagram.com/..." />
+              </div>
+              <div>
+                <label className="label-lux">الموقع</label>
+                <input className="input-lux" value={settingsForm.location} onChange={(e) => setSettingsForm({ ...settingsForm, location: e.target.value })} />
+              </div>
+              <div>
+                <label className="label-lux">العملة</label>
+                <input dir="ltr" className="input-lux text-left" value={settingsForm.currency} onChange={(e) => setSettingsForm({ ...settingsForm, currency: e.target.value })} placeholder="QAR" />
+              </div>
+              <div>
+                <label className="label-lux">اسم العملة</label>
+                <input className="input-lux" value={settingsForm.currencyName} onChange={(e) => setSettingsForm({ ...settingsForm, currencyName: e.target.value })} />
+              </div>
+              <div>
+                <label className="label-lux">ساعات العمل - السبت إلى الخميس</label>
+                <input className="input-lux" value={settingsForm.weekdaysHours} onChange={(e) => setSettingsForm({ ...settingsForm, weekdaysHours: e.target.value })} />
+              </div>
+              <div>
+                <label className="label-lux">ساعات العمل - الجمعة</label>
+                <input className="input-lux" value={settingsForm.fridayHours} onChange={(e) => setSettingsForm({ ...settingsForm, fridayHours: e.target.value })} />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="label-lux">وصف المتجر في أسفل الموقع</label>
+                <textarea rows={3} className="input-lux resize-none" value={settingsForm.footerDescription} onChange={(e) => setSettingsForm({ ...settingsForm, footerDescription: e.target.value })} />
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-6">
+              <button type="submit" disabled={savingStoreSettings} className="btn-primary disabled:opacity-60">
+                <Save size={18} />
+                {savingStoreSettings ? 'جارٍ الحفظ...' : 'حفظ إعدادات المتجر'}
+              </button>
+              <button type="button" onClick={() => setShowStoreSettings(false)} className="btn-outline">إلغاء</button>
+            </div>
+          </form>
         )}
 
         {showForm && (

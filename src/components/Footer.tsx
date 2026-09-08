@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Mail, MapPin, Phone, MessageCircle } from 'lucide-react';
-import { STORE_CONFIG, CATEGORIES } from '@/data/store';
+import { CATEGORIES } from '@/data/store';
+import { useStoreSettings } from '@/store/StoreSettingsContext';
 
 export default function Footer() {
+  const { settings } = useStoreSettings();
   return (
     <footer className="bg-brown-800 text-cream-100 mt-10 sm:mt-20">
       <div className="container-lux py-8 sm:py-12">
@@ -15,12 +17,12 @@ export default function Footer() {
                 <span className="text-brown-900 font-bold">ل</span>
               </div>
               <div>
-                <h3 className="font-bold text-base text-cream-50">{STORE_CONFIG.name}</h3>
-                <p className="text-[10px] text-cream-200/70">{STORE_CONFIG.tagline}</p>
+                <h3 className="font-bold text-base text-cream-50">{settings.name}</h3>
+                <p className="text-[10px] text-cream-200/70">{settings.tagline}</p>
               </div>
             </div>
             <p className="text-xs text-cream-200/80 leading-relaxed">
-              متجر هدايا فاخر يقدم تشكيلة مميزة من الهدايا لكل المناسبات بلمسة راقية.
+              {settings.footerDescription}
             </p>
           </div>
 
@@ -57,24 +59,24 @@ export default function Footer() {
             <ul className="space-y-2">
               <li className="flex items-center gap-2 text-xs text-cream-200/80">
                 <Phone size={14} className="text-gold-300 shrink-0" />
-                <span dir="ltr">{STORE_CONFIG.phone}</span>
+                <span dir="ltr">{settings.phone}</span>
               </li>
               <li className="flex items-center gap-2 text-xs text-cream-200/80">
                 <MessageCircle size={14} className="text-gold-300 shrink-0" />
-                <span>واتساب: {STORE_CONFIG.whatsappNumber}</span>
+                <span>واتساب: {settings.whatsappNumber}</span>
               </li>
               <li className="flex items-center gap-2 text-xs text-cream-200/80">
                 <Mail size={14} className="text-gold-300 shrink-0" />
-                <span dir="ltr">{STORE_CONFIG.email}</span>
+                <span dir="ltr">{settings.email}</span>
               </li>
               <li className="flex items-center gap-2 text-xs text-cream-200/80">
                 <MapPin size={14} className="text-gold-300 shrink-0" />
-                <span>{STORE_CONFIG.location}</span>
+                <span>{settings.location}</span>
               </li>
               <li className="flex items-center gap-2 text-xs text-cream-200/80">
                 <Instagram size={14} className="text-gold-300 shrink-0" />
-                <a href={STORE_CONFIG.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-gold-300 transition-colors">
-                  @{STORE_CONFIG.instagram}
+                <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-gold-300 transition-colors">
+                  @{settings.instagram}
                 </a>
               </li>
             </ul>
@@ -90,13 +92,12 @@ export default function Footer() {
                 <span className="text-brown-900 font-bold text-lg">ل</span>
               </div>
               <div>
-                <h3 className="font-bold text-lg text-cream-50">{STORE_CONFIG.name}</h3>
-                <p className="text-xs text-cream-200/70">{STORE_CONFIG.tagline}</p>
+                <h3 className="font-bold text-lg text-cream-50">{settings.name}</h3>
+                <p className="text-xs text-cream-200/70">{settings.tagline}</p>
               </div>
             </div>
             <p className="text-sm text-cream-200/80 leading-relaxed">
-              في لمسة هدية نؤمن أن الهدية ليست مجرد شيء يُقدّم، بل رسالة ومشاعر وذكرى تبقى. نقدم لكم تشكيلة فاخرة من
-              الهدايا المميزة لكل المناسبات.
+              {settings.footerDescription}
             </p>
           </div>
 
@@ -133,24 +134,24 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-sm text-cream-200/80">
                 <Phone size={16} className="text-gold-300 shrink-0" />
-                <span dir="ltr">{STORE_CONFIG.phone}</span>
+                <span dir="ltr">{settings.phone}</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-cream-200/80">
                 <MessageCircle size={16} className="text-gold-300 shrink-0" />
-                <span>واتساب: {STORE_CONFIG.whatsappNumber}</span>
+                <span>واتساب: {settings.whatsappNumber}</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-cream-200/80">
                 <Mail size={16} className="text-gold-300 shrink-0" />
-                <span dir="ltr">{STORE_CONFIG.email}</span>
+                <span dir="ltr">{settings.email}</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-cream-200/80">
                 <MapPin size={16} className="text-gold-300 shrink-0" />
-                <span>{STORE_CONFIG.location}</span>
+                <span>{settings.location}</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-cream-200/80">
                 <Instagram size={16} className="text-gold-300 shrink-0" />
-                <a href={STORE_CONFIG.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-gold-300 transition-colors">
-                  @{STORE_CONFIG.instagram}
+                <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" className="hover:text-gold-300 transition-colors">
+                  @{settings.instagram}
                 </a>
               </li>
             </ul>
@@ -160,7 +161,7 @@ export default function Footer() {
 
       <div className="border-t border-brown-700">
         <div className="container-lux py-3 sm:py-4 text-center">
-          <p className="text-xs sm:text-sm text-cream-200/60">© 2026 لمسة هدية - جميع الحقوق محفوظة</p>
+          <p className="text-xs sm:text-sm text-cream-200/60">© 2026 {settings.name} - جميع الحقوق محفوظة</p>
         </div>
       </div>
     </footer>

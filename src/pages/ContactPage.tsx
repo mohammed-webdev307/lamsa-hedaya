@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Phone, Mail, MapPin, Clock, Instagram, MessageCircle, Send } from 'lucide-react';
-import { STORE_CONFIG } from '@/data/store';
+import { useStoreSettings } from '@/store/StoreSettingsContext';
 import { buildWhatsAppUrl, buildContactWhatsAppMessage } from '@/utils/whatsapp';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function ContactPage() {
+  const { settings } = useStoreSettings();
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
 
@@ -32,7 +33,7 @@ export default function ContactPage() {
 
               <div className="space-y-4">
                 <a
-                  href={`tel:${STORE_CONFIG.phone}`}
+                  href={`tel:${settings.phone}`}
                   className="flex items-center gap-3 text-brown-500 hover:text-gold-600 transition-colors"
                 >
                   <div className="w-10 h-10 rounded-full bg-cream-100 flex items-center justify-center shrink-0">
@@ -40,7 +41,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-xs text-brown-400">رقم الهاتف</p>
-                    <p className="font-medium" dir="ltr">{STORE_CONFIG.phone}</p>
+                    <p className="font-medium" dir="ltr">{settings.phone}</p>
                   </div>
                 </a>
 
@@ -55,12 +56,12 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-xs text-brown-400">واتساب</p>
-                    <p className="font-medium">{STORE_CONFIG.whatsappNumber}</p>
+                    <p className="font-medium">{settings.whatsappNumber}</p>
                   </div>
                 </a>
 
                 <a
-                  href={`mailto:${STORE_CONFIG.email}`}
+                  href={`mailto:${settings.email}`}
                   className="flex items-center gap-3 text-brown-500 hover:text-gold-600 transition-colors"
                 >
                   <div className="w-10 h-10 rounded-full bg-cream-100 flex items-center justify-center shrink-0">
@@ -68,12 +69,12 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-xs text-brown-400">البريد الإلكتروني</p>
-                    <p className="font-medium" dir="ltr">{STORE_CONFIG.email}</p>
+                    <p className="font-medium" dir="ltr">{settings.email}</p>
                   </div>
                 </a>
 
                 <a
-                  href={STORE_CONFIG.instagramUrl}
+                  href={settings.instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-3 text-brown-500 hover:text-gold-600 transition-colors"
@@ -83,7 +84,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-xs text-brown-400">إنستغرام</p>
-                    <p className="font-medium">@{STORE_CONFIG.instagram}</p>
+                    <p className="font-medium">@{settings.instagram}</p>
                   </div>
                 </a>
 
@@ -93,7 +94,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <p className="text-xs text-brown-400">الموقع</p>
-                    <p className="font-medium">{STORE_CONFIG.location}</p>
+                    <p className="font-medium">{settings.location}</p>
                   </div>
                 </div>
               </div>
@@ -108,11 +109,11 @@ export default function ContactPage() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between py-2 border-b border-beige-100">
                   <span className="text-brown-500 font-medium">السبت إلى الخميس</span>
-                  <span className="text-brown-400 text-sm">9:00 صباحًا - 10:00 مساءً</span>
+                  <span className="text-brown-400 text-sm">{settings.weekdaysHours.replace(/^.*?:\s*/, '')}</span>
                 </div>
                 <div className="flex items-center justify-between py-2">
                   <span className="text-brown-500 font-medium">الجمعة</span>
-                  <span className="text-brown-400 text-sm">4:00 مساءً - 10:00 مساءً</span>
+                  <span className="text-brown-400 text-sm">{settings.fridayHours.replace(/^.*?:\s*/, '')}</span>
                 </div>
               </div>
             </div>
@@ -123,7 +124,7 @@ export default function ContactPage() {
               <div className="aspect-video bg-cream-100 rounded-xl flex items-center justify-center border-2 border-dashed border-beige-200">
                 <div className="text-center">
                   <MapPin size={32} className="text-brown-300 mx-auto mb-2" />
-                  <p className="text-sm text-brown-400">خريطة الموقع - {STORE_CONFIG.location}</p>
+                  <p className="text-sm text-brown-400">خريطة الموقع - {settings.location}</p>
                   <p className="text-xs text-brown-300 mt-1">يمكن إضافة خريطة تفاعلية لاحقًا</p>
                 </div>
               </div>

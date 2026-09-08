@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Gift, Heart, Palette, Sparkles, Award, MessageCircle, ArrowLeft } from 'lucide-react';
-import { STORE_CONFIG } from '@/data/store';
+import { useStoreSettings } from '@/store/StoreSettingsContext';
 import { buildWhatsAppUrl } from '@/utils/whatsapp';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
@@ -33,6 +33,7 @@ const VALUES = [
 ];
 
 export default function AboutPage() {
+  const { settings } = useStoreSettings();
   return (
     <div className="pt-20 pb-12 min-h-screen">
       <div className="container-lux">
@@ -55,8 +56,8 @@ export default function AboutPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-brown-900/60 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-cream-50 mb-2">{STORE_CONFIG.name}</h2>
-            <p className="text-cream-200/90 text-base sm:text-lg">{STORE_CONFIG.tagline}</p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-cream-50 mb-2">{settings.name}</h2>
+            <p className="text-cream-200/90 text-base sm:text-lg">{settings.tagline}</p>
           </div>
         </div>
 

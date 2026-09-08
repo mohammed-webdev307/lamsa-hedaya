@@ -1,9 +1,9 @@
-import { STORE_CONFIG } from '@/data/store';
+import { getRuntimeStoreSettings } from '@/lib/storeSettings';
 import type { CartItem, Product, ProductCustomization } from '@/types';
 import { getCurrentLanguage, translateText } from '@/lib/language';
 
 export function formatPrice(price: number): string {
-  return `${price.toLocaleString('en-US')} ${STORE_CONFIG.currency}`;
+  return `${price.toLocaleString('en-US')} ${getRuntimeStoreSettings().currency}`;
 }
 
 export function getDefaultCustomization(): ProductCustomization {
@@ -18,7 +18,7 @@ export function getDefaultCustomization(): ProductCustomization {
 
 export function buildWhatsAppUrl(message: string): string {
   const encoded = encodeURIComponent(message);
-  return `https://wa.me/${STORE_CONFIG.whatsappNumber}?text=${encoded}`;
+  return `https://wa.me/${getRuntimeStoreSettings().whatsappNumber}?text=${encoded}`;
 }
 
 export function buildProductWhatsAppMessage(
