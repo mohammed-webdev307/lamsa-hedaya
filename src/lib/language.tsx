@@ -53,6 +53,13 @@ const exact: Record<string, string> = {
   'إرسال الطلب عبر واتساب': 'Send Order via WhatsApp', 'سيتم تحويلك إلى واتساب لتأكيد الطلب': 'You will be redirected to WhatsApp to confirm your order',
   'تسجيل الدخول': 'Login', 'جارٍ تسجيل الدخول...': 'Signing in...', 'إظهار كلمة المرور': 'Show password', 'إخفاء كلمة المرور': 'Hide password',
   'إضافة منتج جديد': 'Add New Product', 'تعديل المنتج': 'Edit Product', 'حفظ المنتج': 'Save Product', 'جارٍ الحفظ...': 'Saving...', 'حذف': 'Delete', 'تعديل': 'Edit',
+  'لوحة إدارة المنتجات': 'Product Management', 'أضف المنتجات وعدّل الأسعار والتوفر من داخل الموقع': 'Add products and manage prices and availability from the website',
+  'إعدادات المتجر': 'Store Settings', 'غيّر بيانات المتجر التي تظهر للزبائن بدون تعديل الكود': 'Change the store information shown to customers without editing code',
+  'اسم المتجر': 'Store Name', 'الشعار النصي': 'Tagline', 'رقم واتساب': 'WhatsApp Number', 'البريد الإلكتروني': 'Email', 'اسم إنستغرام': 'Instagram Username', 'رابط إنستغرام': 'Instagram URL',
+  'الموقع': 'Location', 'العملة': 'Currency', 'اسم العملة': 'Currency Name', 'ساعات العمل - السبت إلى الخميس': 'Working Hours - Saturday to Thursday', 'ساعات العمل - الجمعة': 'Working Hours - Friday',
+  'وصف المتجر في أسفل الموقع': 'Store Description in Footer', 'حفظ إعدادات المتجر': 'Save Store Settings', 'تم حفظ إعدادات المتجر بنجاح': 'Store settings saved successfully',
+  'خروج': 'Sign Out', 'إضافة منتج': 'Add Product', 'الجمعة: 4:00 مساءً - 10:00 مساءً': 'Friday: 4:00 PM - 10:00 PM', 'السبت إلى الخميس: 9:00 صباحًا - 10:00 مساءً': 'Saturday to Thursday: 9:00 AM - 10:00 PM',
+  'ريال قطري': 'Qatari Riyal', 'الدوحة، قطر': 'Doha, Qatar',
   'حذف الصورة': 'Delete Image', 'معاينة المنتج': 'Product Preview', 'اكتب اسم المنتج': 'Enter product name', 'اختر صورة أو عدة صور': 'Choose one or more images',
   'جارٍ رفع الصور...': 'Uploading images...', 'تمت إضافة المنتج بنجاح': 'Product added successfully', 'تم تعديل المنتج بنجاح': 'Product updated successfully', 'تم حذف المنتج': 'Product deleted',
   'تمت إضافة المنتج إلى السلة': 'Product added to cart', 'تمت إضافة المنتج إلى المفضلة': 'Product added to wishlist', 'تمت إزالة المنتج من المفضلة': 'Product removed from wishlist',
@@ -135,6 +142,12 @@ const exact: Record<string, string> = {
 
 
 Object.assign(exact, {
+  'في لمسة هدية نؤمن أن الهدية ليست مجرد شيء يُقدّم، بل رسالة ومشاعر وذكرى تبقى.': 'At Lamsa Hedaya, we believe a gift is more than an item. It is a message, a feeling, and a lasting memory.',
+  'التخصيص': 'Personalization',
+  'اكتب اسم المتجر': 'Enter store name',
+  'اكتب رقم واتساب صحيحًا': 'Enter a valid WhatsApp number',
+  'اكتب كل ميزة في سطر منفصل\nتغليف فاخر\nبطاقة إهداء مجانية\nتوصيل سريع': 'Enter each feature on a separate line\nPremium wrapping\nFree gift card\nFast delivery',
+  'إضافة إلى المفضلة': 'Add to Wishlist',
   'نحن هنا لخدمتك. تواصل معنا في أي وقت.': 'We are here to help. Contact us anytime.',
   'معلومات التواصل': 'Contact Information',
   'رقم الهاتف': 'Phone Number',
@@ -239,7 +252,7 @@ Object.assign(exact, {
 const partial: Array<[RegExp, string]> = [
   [/هدايا /g, 'Gifts for '], [/ ريال/g, ' QAR'], [/اسم المنتج/g, 'Product Name'], [/السعر/g, 'Price'], [/الكمية/g, 'Quantity'],
   [/إجمالي المنتج/g, 'Item Total'], [/إجمالي الطلب/g, 'Order Total'], [/لون التغليف/g, 'Wrapping Color'], [/الاسم المخصص/g, 'Custom Name'],
-  [/الملاحظات/g, 'Notes'], [/نوع التغليف/g, 'Wrapping Type'], [/الميزانية/g, 'Budget'], [/الألوان المفضلة/g, 'Preferred Colors'], [/تاريخ التسليم/g, 'Delivery Date']
+  [/الملاحظات/g, 'Notes'], [/جميع الحقوق محفوظة/g, 'All rights reserved'], [/نوع التغليف/g, 'Wrapping Type'], [/الميزانية/g, 'Budget'], [/الألوان المفضلة/g, 'Preferred Colors'], [/تاريخ التسليم/g, 'Delivery Date']
 ];
 
 export function translateText(value: string): string {
