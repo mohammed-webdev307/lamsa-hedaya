@@ -13,13 +13,19 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center">
-                <span className="text-brown-900 font-bold">ل</span>
-              </div>
-              <div>
-                <h3 className="font-bold text-base text-cream-50">{settings.name}</h3>
-                <p className="text-[10px] text-cream-200/70">{settings.tagline}</p>
-              </div>
+              {settings.logoUrl ? (
+                <img src={settings.logoUrl} alt={settings.name} className="h-12 w-auto max-w-[190px] object-contain" />
+              ) : (
+                <>
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center">
+                    <span className="text-brown-900 font-bold">ل</span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-cream-50">{settings.name}</h3>
+                    <p className="text-[10px] text-cream-200/70">{settings.tagline}</p>
+                  </div>
+                </>
+              )}
             </div>
             <p className="text-xs text-cream-200/80 leading-relaxed">
               {settings.footerDescription}
@@ -88,13 +94,19 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center">
-                <span className="text-brown-900 font-bold text-lg">ل</span>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg text-cream-50">{settings.name}</h3>
-                <p className="text-xs text-cream-200/70">{settings.tagline}</p>
-              </div>
+              {settings.logoUrl ? (
+                <img src={settings.logoUrl} alt={settings.name} className="h-14 w-auto max-w-[220px] object-contain" />
+              ) : (
+                <>
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 to-gold-600 flex items-center justify-center">
+                    <span className="text-brown-900 font-bold text-lg">ل</span>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg text-cream-50">{settings.name}</h3>
+                    <p className="text-xs text-cream-200/70">{settings.tagline}</p>
+                  </div>
+                </>
+              )}
             </div>
             <p className="text-sm text-cream-200/80 leading-relaxed">
               {settings.footerDescription}

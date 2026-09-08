@@ -89,6 +89,7 @@ export default function AdminDashboardPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadingHero, setUploadingHero] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [showStoreSettings, setShowStoreSettings] = useState(false);
   const [showHomeSettings, setShowHomeSettings] = useState(false);
   const [savingStoreSettings, setSavingStoreSettings] = useState(false);
@@ -285,6 +286,45 @@ export default function AdminDashboardPage() {
     const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
     setSettingsForm((prev) => ({ ...prev, heroImage: data.publicUrl }));
     setUploadingHero(false);
+    e.target.value = '';
+  }
+
+  async function handleLogoUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setError(`الملف "${file.name}" ليس صورة`);
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setError(`الصورة "${file.name}" أكبر من 5 ميجابايت`);
+      e.target.value = '';
+      return;
+    }
+
+    setUploadingLogo(true);
+    setError('');
+
+    const extension = file.name.split('.').pop()?.toLowerCase() || 'png';
+    const fileName = `${crypto.randomUUID()}.${extension}`;
+    const filePath = `branding/${fileName}`;
+    const { error: uploadError } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, file, { cacheControl: '3600', upsert: false });
+
+    if (uploadError) {
+      setError(`تعذر رفع الشعار: ${uploadError.message}`);
+      setUploadingLogo(false);
+      e.target.value = '';
+      return;
+    }
+
+    const { data } = supabase.storage.from('product-images').getPublicUrl(filePath);
+    setSettingsForm((prev) => ({ ...prev, logoUrl: data.publicUrl }));
+    setUploadingLogo(false);
     e.target.value = '';
   }
 
@@ -610,6 +650,21 @@ export default function AdminDashboardPage() {
               <div>
                 <label className="label-lux">الشعار النصي</label>
                 <input className="input-lux" value={settingsForm.tagline} onChange={(e) => setSettingsForm({ ...settingsForm, tagline: e.target.value })} />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="label-lux">شعار المتجر</label>
+                <label className="mt-1 flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-beige-200 bg-beige-50 p-4 text-center hover:bg-beige-100">
+                  <Upload size={22} />
+                  <span className="text-sm font-medium text-brown-600">{uploadingLogo ? 'جارٍ رفع الشعار...' : 'اختر شعارًا من الجهاز'}</span>
+                  <span className="text-xs text-brown-400">PNG أو JPG أو WEBP — يفضل PNG بخلفية شفافة</span>
+                  <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} disabled={uploadingLogo} />
+                </label>
+                {settingsForm.logoUrl && (
+                  <div className="mt-3 flex items-center gap-4 rounded-xl border border-beige-100 bg-white p-3">
+                    <img src={settingsForm.logoUrl} alt="شعار المتجر" className="h-20 max-w-[220px] object-contain" />
+                    <button type="button" className="btn-outline !py-2" onClick={() => setSettingsForm({ ...settingsForm, logoUrl: '' })}>إزالة الشعار</button>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="label-lux">رقم واتساب</label>

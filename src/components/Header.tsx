@@ -57,13 +57,19 @@ export default function Header() {
           <div className="flex items-center justify-between gap-4">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2 shrink-0">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 to-brown-500 flex items-center justify-center">
-                <span className="text-cream-50 font-bold text-lg">ل</span>
-              </div>
-              <div className="hidden sm:block">
-                <h1 className="font-bold text-brown-700 text-lg leading-tight">{settings.name}</h1>
-                <p className="text-xs text-brown-400 leading-tight">{settings.tagline}</p>
-              </div>
+              {settings.logoUrl ? (
+                <img src={settings.logoUrl} alt={settings.name} className="h-10 sm:h-12 w-auto max-w-[150px] sm:max-w-[190px] object-contain" />
+              ) : (
+                <>
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-gold-400 to-brown-500 flex items-center justify-center">
+                    <span className="text-cream-50 font-bold text-lg">ل</span>
+                  </div>
+                  <div className="hidden sm:block">
+                    <h1 className="font-bold text-brown-700 text-lg leading-tight">{settings.name}</h1>
+                    <p className="text-xs text-brown-400 leading-tight">{settings.tagline}</p>
+                  </div>
+                </>
+              )}
             </Link>
 
             {/* Desktop Nav */}
@@ -171,10 +177,16 @@ export default function Header() {
           <div className="absolute top-0 right-0 bottom-0 w-80 max-w-[85%] bg-cream-50 shadow-2xl animate-slide-in flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-beige-200">
               <div className="flex items-center gap-2">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold-400 to-brown-500 flex items-center justify-center">
-                  <span className="text-cream-50 font-bold">ل</span>
-                </div>
-                <span className="font-bold text-brown-700">{settings.name}</span>
+                {settings.logoUrl ? (
+                  <img src={settings.logoUrl} alt={settings.name} className="h-10 w-auto max-w-[170px] object-contain" />
+                ) : (
+                  <>
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-gold-400 to-brown-500 flex items-center justify-center">
+                      <span className="text-cream-50 font-bold">ل</span>
+                    </div>
+                    <span className="font-bold text-brown-700">{settings.name}</span>
+                  </>
+                )}
               </div>
               <button
                 onClick={() => setMobileOpen(false)}

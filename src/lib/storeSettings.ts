@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 export interface StoreSettings {
   name: string;
   tagline: string;
+  logoUrl: string;
   currency: string;
   currencyName: string;
   whatsappNumber: string;
@@ -30,6 +31,7 @@ export interface StoreSettings {
 export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   name: STORE_CONFIG.name,
   tagline: STORE_CONFIG.tagline,
+  logoUrl: '',
   currency: STORE_CONFIG.currency,
   currencyName: STORE_CONFIG.currencyName,
   whatsappNumber: STORE_CONFIG.whatsappNumber,
@@ -75,6 +77,7 @@ export async function fetchStoreSettings(): Promise<StoreSettings> {
   return {
     name: data.name || DEFAULT_STORE_SETTINGS.name,
     tagline: data.tagline || DEFAULT_STORE_SETTINGS.tagline,
+    logoUrl: data.logo_url || DEFAULT_STORE_SETTINGS.logoUrl,
     currency: data.currency || DEFAULT_STORE_SETTINGS.currency,
     currencyName: data.currency_name || DEFAULT_STORE_SETTINGS.currencyName,
     whatsappNumber: data.whatsapp_number || DEFAULT_STORE_SETTINGS.whatsappNumber,
@@ -104,6 +107,7 @@ export async function saveStoreSettings(settings: StoreSettings) {
     id: 1,
     name: settings.name.trim(),
     tagline: settings.tagline.trim(),
+    logo_url: settings.logoUrl.trim(),
     currency: settings.currency.trim() || 'QAR',
     currency_name: settings.currencyName.trim(),
     whatsapp_number: settings.whatsappNumber.replace(/[^0-9]/g, ''),
