@@ -15,6 +15,16 @@ export interface StoreSettings {
   weekdaysHours: string;
   fridayHours: string;
   footerDescription: string;
+  heroBadge: string;
+  heroTitle: string;
+  heroDescription: string;
+  heroImage: string;
+  showCategories: boolean;
+  showBestSellers: boolean;
+  showOccasions: boolean;
+  showWhyUs: boolean;
+  showTestimonials: boolean;
+  showCustomGiftCta: boolean;
 }
 
 export const DEFAULT_STORE_SETTINGS: StoreSettings = {
@@ -31,6 +41,16 @@ export const DEFAULT_STORE_SETTINGS: StoreSettings = {
   weekdaysHours: STORE_CONFIG.workingHours.weekdays,
   fridayHours: STORE_CONFIG.workingHours.friday,
   footerDescription: 'متجر هدايا فاخر يقدم تشكيلة مميزة من الهدايا لكل المناسبات بلمسة راقية.',
+  heroBadge: 'متجر هدايا فاخر',
+  heroTitle: 'هدية صغيرة.. تصنع ذكرى كبيرة',
+  heroDescription: 'اختر هديتك المميزة واجعل كل مناسبة ذكرى لا تُنسى.',
+  heroImage: 'https://images.pexels.com/photos/30632274/pexels-photo-30632274.png?auto=compress&cs=tinysrgb&h=650&w=940',
+  showCategories: true,
+  showBestSellers: true,
+  showOccasions: true,
+  showWhyUs: true,
+  showTestimonials: true,
+  showCustomGiftCta: true,
 };
 
 let runtimeSettings: StoreSettings = DEFAULT_STORE_SETTINGS;
@@ -66,6 +86,16 @@ export async function fetchStoreSettings(): Promise<StoreSettings> {
     weekdaysHours: data.weekdays_hours || DEFAULT_STORE_SETTINGS.weekdaysHours,
     fridayHours: data.friday_hours || DEFAULT_STORE_SETTINGS.fridayHours,
     footerDescription: data.footer_description || DEFAULT_STORE_SETTINGS.footerDescription,
+    heroBadge: data.hero_badge || DEFAULT_STORE_SETTINGS.heroBadge,
+    heroTitle: data.hero_title || DEFAULT_STORE_SETTINGS.heroTitle,
+    heroDescription: data.hero_description || DEFAULT_STORE_SETTINGS.heroDescription,
+    heroImage: data.hero_image || DEFAULT_STORE_SETTINGS.heroImage,
+    showCategories: data.show_categories ?? DEFAULT_STORE_SETTINGS.showCategories,
+    showBestSellers: data.show_best_sellers ?? DEFAULT_STORE_SETTINGS.showBestSellers,
+    showOccasions: data.show_occasions ?? DEFAULT_STORE_SETTINGS.showOccasions,
+    showWhyUs: data.show_why_us ?? DEFAULT_STORE_SETTINGS.showWhyUs,
+    showTestimonials: data.show_testimonials ?? DEFAULT_STORE_SETTINGS.showTestimonials,
+    showCustomGiftCta: data.show_custom_gift_cta ?? DEFAULT_STORE_SETTINGS.showCustomGiftCta,
   };
 }
 
@@ -85,6 +115,16 @@ export async function saveStoreSettings(settings: StoreSettings) {
     weekdays_hours: settings.weekdaysHours.trim(),
     friday_hours: settings.fridayHours.trim(),
     footer_description: settings.footerDescription.trim(),
+    hero_badge: settings.heroBadge.trim(),
+    hero_title: settings.heroTitle.trim(),
+    hero_description: settings.heroDescription.trim(),
+    hero_image: settings.heroImage.trim(),
+    show_categories: settings.showCategories,
+    show_best_sellers: settings.showBestSellers,
+    show_occasions: settings.showOccasions,
+    show_why_us: settings.showWhyUs,
+    show_testimonials: settings.showTestimonials,
+    show_custom_gift_cta: settings.showCustomGiftCta,
     updated_at: new Date().toISOString(),
   });
 }

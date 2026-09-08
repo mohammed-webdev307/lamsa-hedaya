@@ -23,6 +23,7 @@ import StarRating from '@/components/StarRating';
 import { CATEGORIES, TESTIMONIALS, WHY_US, OCCASIONS } from '@/data/store';
 import { buildWhatsAppUrl } from '@/utils/whatsapp';
 import { useProducts } from '@/hooks/useProducts';
+import { useStoreSettings } from '@/store/StoreSettingsContext';
 
 const ICON_MAP: Record<string, typeof Gift> = {
   Gift,
@@ -42,6 +43,7 @@ const ICON_MAP: Record<string, typeof Gift> = {
 
 export default function HomePage() {
   const { products, loading } = useProducts();
+  const { settings } = useStoreSettings();
   const markedBestSellers = products.filter((p) => p.badge === 'bestseller');
   const bestSellers = (markedBestSellers.length > 0 ? markedBestSellers : products).slice(0, 4);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -77,12 +79,12 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center">
             {/* Text */}
             <div className="text-center lg:text-right order-2 lg:order-1 animate-fade-in-up">
-              <span className="badge bg-gold-100 text-gold-700 mb-3 sm:mb-4">متجر هدايا فاخر</span>
+              <span className="badge bg-gold-100 text-gold-700 mb-3 sm:mb-4">{settings.heroBadge}</span>
               <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-brown-700 leading-tight mb-3 sm:mb-4 text-balance">
-                هدية صغيرة.. تصنع ذكرى كبيرة
+                {settings.heroTitle}
               </h1>
               <p className="text-sm sm:text-lg text-brown-400 mb-5 sm:mb-8 max-w-lg mx-auto lg:mx-0">
-                اختر هديتك المميزة واجعل كل مناسبة ذكرى لا تُنسى.
+                {settings.heroDescription}
               </p>
               <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 justify-center lg:justify-start max-w-sm sm:max-w-none mx-auto">
                 <Link to="/products" className="btn-primary text-sm sm:text-base">
@@ -105,7 +107,7 @@ export default function HomePage() {
             <div className="relative animate-fade-in-up order-1 lg:order-2" style={{ animationDelay: '0.2s' }}>
               <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl sm:shadow-2xl aspect-[4/3] sm:aspect-square">
                 <img
-                  src="https://images.pexels.com/photos/30632274/pexels-photo-30632274.png?auto=compress&cs=tinysrgb&h=650&w=940"
+                  src={settings.heroImage}
                   alt="بوكس هدية فاخر"
                   className="w-full h-full object-cover"
                 />
@@ -125,6 +127,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      {settings.showCategories && (<>
       {/* Categories - Horizontal scroll on mobile, grid on desktop */}
       <section className="py-8 sm:py-16">
         <div className="container-lux">
@@ -199,7 +202,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </>)}
 
+      {settings.showBestSellers && (<>
       {/* Best Sellers - Only 4 products on homepage */}
       <section className="py-8 sm:py-16 bg-cream-100/50">
         <div className="container-lux">
@@ -235,7 +240,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </>)}
 
+      {settings.showOccasions && (<>
       {/* Occasions - Compact */}
       <section className="py-8 sm:py-16">
         <div className="container-lux">
@@ -292,7 +299,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </>)}
 
+      {settings.showWhyUs && (<>
       {/* Why Us - Compact on mobile */}
       <section className="py-10 sm:py-20 bg-brown-800 text-cream-100">
         <div className="container-lux">
@@ -321,7 +330,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </>)}
 
+      {settings.showTestimonials && (<>
       {/* Testimonials - Carousel on mobile, grid on desktop */}
       <section className="py-8 sm:py-16">
         <div className="container-lux">
@@ -385,7 +396,9 @@ export default function HomePage() {
           )}
         </div>
       </section>
+      </>)}
 
+      {settings.showCustomGiftCta && (<>
       {/* CTA */}
       <section className="py-8 sm:py-16">
         <div className="container-lux">
@@ -405,6 +418,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </>)}
     </div>
   );
 }

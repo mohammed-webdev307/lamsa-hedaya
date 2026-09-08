@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
-import { LogOut, Plus, Pencil, Trash2, Package, X, Upload, Save, Search, Settings } from 'lucide-react';
+import { LogOut, Plus, Pencil, Trash2, Package, X, Upload, Save, Search, Settings, Home } from 'lucide-react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { CATEGORIES } from '@/data/store';
@@ -89,6 +89,7 @@ export default function AdminDashboardPage() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [showStoreSettings, setShowStoreSettings] = useState(false);
+  const [showHomeSettings, setShowHomeSettings] = useState(false);
   const [savingStoreSettings, setSavingStoreSettings] = useState(false);
   const [settingsForm, setSettingsForm] = useState<StoreSettings>(settings);
 
@@ -401,6 +402,7 @@ export default function AdminDashboardPage() {
     await refreshStoreSettings();
     setSuccess('تم حفظ إعدادات المتجر بنجاح');
     setShowStoreSettings(false);
+    setShowHomeSettings(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -449,6 +451,19 @@ export default function AdminDashboardPage() {
               إعدادات المتجر
             </button>
 
+            <button
+              onClick={() => {
+                setSettingsForm(settings);
+                setShowHomeSettings((prev) => !prev);
+                setShowStoreSettings(false);
+                setShowForm(false);
+              }}
+              className="btn-outline"
+            >
+              <Home size={18} />
+              إعدادات الصفحة الرئيسية
+            </button>
+
             <button onClick={openAdd} className="btn-primary">
               <Plus size={18} />
               إضافة منتج
@@ -471,6 +486,46 @@ export default function AdminDashboardPage() {
           <div className="mb-4 rounded-xl bg-green-50 border border-green-200 p-3 text-sm text-green-700">
             {success}
           </div>
+        )}
+
+        {showHomeSettings && (
+          <form
+            onSubmit={handleStoreSettingsSave}
+            className="bg-white border border-beige-100 rounded-2xl shadow-sm p-4 sm:p-6 mb-6"
+          >
+            <div className="flex items-center justify-between gap-3 mb-5">
+              <div>
+                <h2 className="font-bold text-brown-700 text-xl flex items-center gap-2"><Home size={20} /> إعدادات الصفحة الرئيسية</h2>
+                <p className="text-sm text-brown-400 mt-1">تحكم في واجهة الصفحة الرئيسية بدون تعديل الكود</p>
+              </div>
+              <button type="button" onClick={() => setShowHomeSettings(false)} className="p-2 text-brown-400"><X size={20} /></button>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><label className="label-lux">الشارة أعلى العنوان</label><input className="input-lux" value={settingsForm.heroBadge} onChange={(e) => setSettingsForm({ ...settingsForm, heroBadge: e.target.value })} /></div>
+              <div><label className="label-lux">العنوان الرئيسي</label><input className="input-lux" value={settingsForm.heroTitle} onChange={(e) => setSettingsForm({ ...settingsForm, heroTitle: e.target.value })} /></div>
+              <div className="sm:col-span-2"><label className="label-lux">الوصف الرئيسي</label><textarea rows={3} className="input-lux resize-none" value={settingsForm.heroDescription} onChange={(e) => setSettingsForm({ ...settingsForm, heroDescription: e.target.value })} /></div>
+              <div className="sm:col-span-2"><label className="label-lux">رابط صورة الغلاف</label><input dir="ltr" className="input-lux text-left" value={settingsForm.heroImage} onChange={(e) => setSettingsForm({ ...settingsForm, heroImage: e.target.value })} placeholder="https://..." /></div>
+            </div>
+
+            <h3 className="font-bold text-brown-700 mt-6 mb-3">إظهار وإخفاء أقسام الصفحة</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                ['showCategories', 'التصنيفات'], ['showBestSellers', 'الأكثر طلبًا'], ['showOccasions', 'المناسبات'],
+                ['showWhyUs', 'لماذا لمسة هدية؟'], ['showTestimonials', 'آراء العملاء'], ['showCustomGiftCta', 'صمم هديتك']
+              ].map(([key, label]) => (
+                <label key={key} className="flex items-center gap-3 rounded-xl border border-beige-100 p-3 cursor-pointer">
+                  <input type="checkbox" checked={Boolean(settingsForm[key as keyof StoreSettings])} onChange={(e) => setSettingsForm({ ...settingsForm, [key]: e.target.checked })} />
+                  <span className="text-sm font-medium text-brown-600">{label}</span>
+                </label>
+              ))}
+            </div>
+
+            <div className="flex gap-2 mt-6">
+              <button type="submit" disabled={savingStoreSettings} className="btn-primary"><Save size={18} />{savingStoreSettings ? 'جارٍ الحفظ...' : 'حفظ إعدادات الصفحة'}</button>
+              <button type="button" onClick={() => setShowHomeSettings(false)} className="btn-outline">إلغاء</button>
+            </div>
+          </form>
         )}
 
         {showStoreSettings && (
