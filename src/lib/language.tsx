@@ -254,177 +254,48 @@ export function translateText(value: string): string {
 type LanguageContextValue = { language: Language; toggleLanguage: () => void };
 const LanguageContext = createContext<LanguageContextValue>({ language: 'ar', toggleLanguage: () => {} });
 
-const AUTO_CACHE_KEY = 'lamsa-auto-translation-cache-v1';
-const ARABIC_RE = /[\u0600-\u06ff]/;
-
-type TextNodeWithOriginal = Node & { __arOriginal?: string };
-
-type TranslationCache = Record<string, string>;
-
-function loadAutoCache(): TranslationCache {
-  try {
-    return JSON.parse(localStorage.getItem(AUTO_CACHE_KEY) || '{}') as TranslationCache;
-  } catch {
-    return {};
-  }
-}
-
-let autoCache: TranslationCache = loadAutoCache();
-let cacheSaveTimer: number | undefined;
-
-function saveAutoCacheSoon() {
-  if (cacheSaveTimer) window.clearTimeout(cacheSaveTimer);
-  cacheSaveTimer = window.setTimeout(() => {
-    try {
-      localStorage.setItem(AUTO_CACHE_KEY, JSON.stringify(autoCache));
-    } catch {
-      // Ignore storage quota/private-mode errors.
-    }
-  }, 250);
-}
-
-const pendingTranslations = new Map<string, Promise<string>>();
-
-/**
- * Automatic fallback translator.
- *
- * 1) Uses our curated translations first (fast + consistent UI wording).
- * 2) If Arabic remains, translates it automatically through MyMemory.
- * 3) Caches the result in localStorage so the same phrase is not requested again.
- * 4) If the service is unavailable/rate-limited, keeps the best local translation.
- */
-async function autoTranslateText(value: string): Promise<string> {
-  const local = translateText(value);
-  if (!ARABIC_RE.test(local)) return local;
-
-  const trimmed = local.trim();
-  if (!trimmed) return local;
-
-  const cached = autoCache[trimmed];
-  if (cached) return local.replace(trimmed, cached);
-
-  const existing = pendingTranslations.get(trimmed);
-  if (existing) {
-    const translated = await existing;
-    return local.replace(trimmed, translated);
-  }
-
-  const request = (async () => {
-    try {
-      const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(trimmed)}&langpair=ar|en`;
-      const response = await fetch(url, { headers: { Accept: 'application/json' } });
-      if (!response.ok) return trimmed;
-      const data = await response.json() as {
-        responseData?: { translatedText?: string };
-        responseStatus?: number | string;
-      };
-      const translated = data.responseData?.translatedText?.trim();
-      if (!translated || translated === trimmed || ARABIC_RE.test(translated)) return trimmed;
-      autoCache[trimmed] = translated;
-      saveAutoCacheSoon();
-      return translated;
-    } catch {
-      return trimmed;
-    }
-  })();
-
-  pendingTranslations.set(trimmed, request);
-  try {
-    const translated = await request;
-    return local.replace(trimmed, translated);
-  } finally {
-    pendingTranslations.delete(trimmed);
-  }
-}
-
-function shouldSkipElement(element: Element | null) {
-  if (!element) return true;
-  return Boolean(element.closest('script, style, noscript, code, pre, [data-no-auto-translate]'));
-}
-
-function translateTextNode(node: TextNodeWithOriginal) {
-  const parent = node.parentElement;
-  if (shouldSkipElement(parent)) return;
-
-  const current = node.nodeValue ?? '';
-  const original = node.__arOriginal ?? current;
-  if (!ARABIC_RE.test(original)) return;
-  node.__arOriginal = original;
-
-  // Apply curated/local translation immediately to avoid visible delay.
-  const local = translateText(original);
-  if (node.nodeValue !== local) node.nodeValue = local;
-
-  if (!ARABIC_RE.test(local)) return;
-
-  void autoTranslateText(original).then((translated) => {
-    if (localStorage.getItem(STORAGE_KEY) !== 'en') return;
-    if (!node.isConnected) return;
-    if (node.nodeValue !== translated) node.nodeValue = translated;
-  });
-}
-
-function translateElementAttributes(element: Element) {
-  if (shouldSkipElement(element)) return;
-  for (const attr of ['placeholder', 'aria-label', 'title']) {
-    const value = element.getAttribute(attr);
-    if (!value) continue;
-    const dataAttr = `data-ar-${attr.replace('-', '')}`;
-    const original = element.getAttribute(dataAttr) || value;
-    if (!ARABIC_RE.test(original)) continue;
-
-    element.setAttribute(dataAttr, original);
-    const local = translateText(original);
-    element.setAttribute(attr, local);
-
-    if (!ARABIC_RE.test(local)) continue;
-    void autoTranslateText(original).then((translated) => {
-      if (localStorage.getItem(STORAGE_KEY) !== 'en') return;
-      if (!element.isConnected) return;
-      element.setAttribute(attr, translated);
-    });
-  }
-}
-
 function translateNode(root: Node) {
-  if (root.nodeType === Node.TEXT_NODE) {
-    translateTextNode(root as TextNodeWithOriginal);
-    return;
-  }
-
-  if (root instanceof Element && shouldSkipElement(root)) return;
-
-  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-  let node: Node | null;
-  while ((node = walker.nextNode())) translateTextNode(node as TextNodeWithOriginal);
-
-  if (root instanceof Element) {
-    translateElementAttributes(root);
-    root.querySelectorAll('*').forEach(translateElementAttributes);
-  }
-}
-
-function restoreNode(root: Node) {
-  if (root.nodeType === Node.TEXT_NODE) {
-    const node = root as TextNodeWithOriginal;
-    if (node.__arOriginal !== undefined) node.nodeValue = node.__arOriginal;
-    return;
-  }
-
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let node: Node | null;
   while ((node = walker.nextNode())) {
-    const original = (node as TextNodeWithOriginal).__arOriginal;
-    if (original !== undefined) node.nodeValue = original;
+    const parent = node.parentElement;
+    if (!parent || parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE') continue;
+    const original = (node as Node & { __arOriginal?: string }).__arOriginal ?? node.nodeValue ?? '';
+    if (/[\u0600-\u06ff]/.test(original)) {
+      (node as Node & { __arOriginal?: string }).__arOriginal = original;
+      node.nodeValue = translateText(original);
+    }
   }
-
   if (root instanceof Element) {
     const elements = [root, ...Array.from(root.querySelectorAll('*'))];
     for (const element of elements) {
       for (const attr of ['placeholder', 'aria-label', 'title']) {
+        const value = element.getAttribute(attr);
+        if (!value) continue;
         const dataAttr = `data-ar-${attr.replace('-', '')}`;
-        const original = element.getAttribute(dataAttr);
-        if (original !== null) element.setAttribute(attr, original);
+        const original = element.getAttribute(dataAttr) || value;
+        if (/[\u0600-\u06ff]/.test(original)) {
+          element.setAttribute(dataAttr, original);
+          element.setAttribute(attr, translateText(original));
+        }
+      }
+    }
+  }
+}
+
+function restoreNode(root: Node) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let node: Node | null;
+  while ((node = walker.nextNode())) {
+    const original = (node as Node & { __arOriginal?: string }).__arOriginal;
+    if (original) node.nodeValue = original;
+  }
+  if (root instanceof Element) {
+    const elements = [root, ...Array.from(root.querySelectorAll('*'))];
+    for (const element of elements) {
+      for (const attr of ['placeholder', 'aria-label', 'title']) {
+        const original = element.getAttribute(`data-ar-${attr.replace('-', '')}`);
+        if (original) element.setAttribute(attr, original);
       }
     }
   }
@@ -447,34 +318,22 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       if (language !== 'en') return;
       for (const mutation of mutations) {
         if (mutation.type === 'characterData') {
-          const node = mutation.target as TextNodeWithOriginal;
-          // Ignore mutations produced by our own translation when an Arabic original already exists.
-          if (node.__arOriginal && !ARABIC_RE.test(node.nodeValue || '')) continue;
-          translateTextNode(node);
+          const node = mutation.target;
+          const original = (node as Node & { __arOriginal?: string }).__arOriginal ?? node.nodeValue ?? '';
+          if (/[\u0600-\u06ff]/.test(original)) {
+            (node as Node & { __arOriginal?: string }).__arOriginal = original;
+            const translated = translateText(original);
+            if (node.nodeValue !== translated) node.nodeValue = translated;
+          }
         }
         for (const node of Array.from(mutation.addedNodes)) translateNode(node);
-        if (mutation.type === 'attributes' && mutation.target instanceof Element) {
-          translateElementAttributes(mutation.target);
-        }
       }
     });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      characterData: true,
-      attributes: true,
-      attributeFilter: ['placeholder', 'aria-label', 'title'],
-    });
-
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     return () => observer.disconnect();
   }, [language]);
 
-  const value = useMemo(
-    () => ({ language, toggleLanguage: () => setLanguage((v) => v === 'ar' ? 'en' : 'ar') }),
-    [language],
-  );
-
+  const value = useMemo(() => ({ language, toggleLanguage: () => setLanguage((v) => v === 'ar' ? 'en' : 'ar') }), [language]);
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
