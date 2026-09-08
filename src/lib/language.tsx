@@ -61,7 +61,76 @@ const exact: Record<string, string> = {
   'شوكولاتة فاخرة بتصاميم راقية': 'Luxury chocolates with elegant designs', 'دمى ناعمة مع هدايا وورود': 'Soft plush toys with gifts and flowers',
   'عطور فاخرة بروائح مميزة': 'Luxury perfumes with distinctive scents', 'صمم هديتك بنفسك بلمسة خاصة': 'Design your own gift with a personal touch',
   'احتفل بالتخرج بأسلوب مميز': 'Celebrate graduation in a special way', 'هدايا أعياد الميلاد المميزة': 'Special birthday gifts',
-  'هدايا الخطوبة والزواج الفاخرة': 'Luxury engagement and wedding gifts', 'هدايا استقبال المولود الجديد': 'New baby welcome gifts'
+  'هدايا الخطوبة والزواج الفاخرة': 'Luxury engagement and wedding gifts', 'هدايا استقبال المولود الجديد': 'New baby welcome gifts',
+  'متجر هدايا فاخر يقدم تشكيلة مميزة من الهدايا لكل المناسبات بلمسة راقية.': 'A luxury gift store offering a distinctive selection of gifts for every occasion with an elegant touch.',
+  'في لمسة هدية نؤمن أن الهدية ليست مجرد شيء يُقدّم، بل رسالة ومشاعر وذكرى تبقى. نقدم لكم تشكيلة فاخرة من الهدايا المميزة لكل المناسبات.': 'At Lamsa Hedaya, we believe a gift is more than an item—it is a message, a feeling, and a lasting memory. We offer a premium selection of gifts for every occasion.',
+  '© 2026 لمسة هدية - جميع الحقوق محفوظة': '© 2026 Lamsa Hedaya - All rights reserved',
+  'إمكانية تخصيص الهدية': 'Gift Personalization', 'الاهتمام بالتفاصيل': 'Attention to Detail', 'جودة المنتجات': 'Product Quality', 'خدمة العملاء': 'Customer Service',
+  'منتجات مختارة بأعلى معايير الجودة': 'Carefully selected products with high quality standards',
+  'تغليف راقٍ يليق بمناسباتكم المميزة': 'Elegant wrapping worthy of your special occasions',
+  'توصيل في نفس اليوم داخل قطر': 'Same-day delivery within Qatar', 'خدمة عملاء عبر واتساب': 'Customer service via WhatsApp',
+  'تخصيص كامل': 'Full Customization', 'تشكيلة واسعة تناسب كل المناسبات': 'A wide selection for every occasion',
+  'نختار كل منتج بعناية فائقة من أجود المصادر، لنضمن لكم جودة عالية تستحق مناسباتكم المميزة. كل تفصيلة في منتجاتنا مدروسة بعناية.': 'We carefully select every product from trusted sources to deliver the quality your special occasions deserve. Every detail is thoughtfully considered.',
+  'نقدم لكم إمكانية تخصيص الهدايا بالأسماء والرسائل وألوان التغليف، لتكون هديتك فريدة تمامًا وتحمل لمستك الشخصية الخاصة.': 'Personalize gifts with names, messages, and wrapping colors to create a truly unique gift with your personal touch.',
+  'من اختيار المنتج إلى التغليف والتوصيل، نهتم بأدق التفاصيل لنضمن لكم تجربة استثنائية تليق بمن تحبون.': 'From product selection to wrapping and delivery, we care about every detail to create an exceptional gifting experience.',
+  'فريقنا متاح عبر واتساب لمساعدتكم في اختيار الهدية المثالية وتخصيصها. نحن هنا لخدمتكم في كل خطوة.': 'Our team is available on WhatsApp to help you choose and personalize the perfect gift. We are here for you every step of the way.',
+  'طلبت هدية تخرج وكانت النتيجة رائعة جدًا. الورد كان طازج والتغليف فخم. شكرًا لمسة هدية على الذوق الرفيع.': 'I ordered a graduation gift and the result was wonderful. The flowers were fresh and the wrapping was luxurious. Thank you, Lamsa Hedaya, for the beautiful taste.',
+  'التغليف كان أجمل من الصور ووصل الطلب في الوقت المحدد. تجربة راقية بكل المقاييس وسأكررها بالتأكيد.': 'The wrapping was even better than the photos and the order arrived on time. A truly elegant experience that I will definitely repeat.',
+  'خدمة ممتازة وتعامل سريع عبر واتساب. ساعدوني في اختيار الهدية المناسبة ووصلت في نفس اليوم. تعامل راقٍ ومميز.': 'Excellent service and fast communication via WhatsApp. They helped me choose the right gift and it arrived the same day.',
+  'طلبت بوكس خطوبة وكان فوق التوقعات. الجودة عالية والتفاصيل دقيقة. جعلت المناسبة أكثر تميزًا. أنصح به بشدة.': 'I ordered an engagement box and it exceeded expectations. The quality was high and the details were beautiful. Highly recommended.',
+  'أحمد الكواري': 'Ahmed Al-Kuwari', 'خالد المري': 'Khalid Al-Marri', 'سارة المهندي': 'Sara Al-Mohannadi', 'نورة العبدالله': 'Noura Al-Abdullah', 'عميل سعيد': 'Happy Customer',
+  'بوكس احتفالي متكامل لعيد ميلاد لا يُنسى': 'A complete celebration box for an unforgettable birthday',
+  'تشكيلة شوكولاتة بلجيكية فاخرة في علبة أنيقة': 'A selection of premium Belgian chocolates in an elegant box',
+  'باقة ورد أبيض أنيقة بلمسة راقية': 'An elegant white rose bouquet with a refined touch',
+  'باقة ورد وردي رومانطقية بتصميم ساحر': 'A romantic pink rose bouquet with a charming design',
+  'بوكس احتفالي مميز للاحتفال بالتخرج': 'A special celebration box for graduation',
+  'بوكس فاخر للخطوبة يجمع الورد والحلويات': 'A luxury engagement box combining flowers and sweets',
+  'عطر فاخر مع شوكولاتة راقية في بوكس أنيق': 'Luxury perfume with fine chocolate in an elegant box',
+  'ورد طبيعي مع شوكولاتة فاخرة في بوكس راقٍ': 'Fresh flowers with premium chocolate in an elegant box',
+  'تشكيلة منتجات عناية فاخرة للعناية بالبشرة': 'A selection of premium skincare products',
+  'تشكيلة قهوة مختارة مع حلويات لذيذة': 'Selected coffee with delicious sweets',
+  'بوكس فاخر للاحتفال بالمناسبات والذكريات': 'A luxury box for special occasions and memories',
+  'بوكس مفاجئة بمحتويات متنوعة ومميزة': 'A surprise box with varied and special contents',
+  'هدية مخصصة بالاسم مع نقش احترافي': 'A personalized name gift with professional engraving',
+  'صندوق هدية قابل للتخصيص بالكامل حسب رغبتك': 'A fully customizable gift box designed your way',
+  'بوكس الورد الملكي عبارة عن مجموعة فاخرة تجمع بين الورد الأحمر الطبيعي الطازج وشوكولاتة فاخرة، مع إمكانية إضافة بطاقة إهداء مخصصة. مصمم بعناية ليكون الهدية المثالية للتعبير عن أسمى مشاعر الحب والتقدير في المناسبات الخاصة.': 'The Royal Rose Box combines fresh natural red roses with premium chocolate and an optional personalized gift card. Carefully designed for special occasions.',
+  'بوكس شوكولاتة فاخر يحتوي على تشكيلة مختارة من الشوكولاتة البلجيكية الفاخرة بأنواعها المختلفة، مصممة في علبة أنيقة تصلح كهدية راقية لمحبي الشوكولاتة في كل المناسبات.': 'A luxury chocolate box featuring a selected assortment of premium Belgian chocolates in an elegant presentation, perfect for every occasion.',
+  'بوكس عيد ميلاد مميز يحتوي على ورد طبيعي وشوكولاتة وحلويات احتفالية مع بطاقة تهنئة مخصصة. مصمم بألوان مبهجة ليضيف لمسة فرح وسرور على عيد ميلاد من تحب.': 'A special birthday box with fresh flowers, chocolate, celebration sweets, and a personalized greeting card, designed to add joy to a loved one’s birthday.',
+  'دبدوب ناعم عالي الجودة مع باقة ورد وردي طبيعي، هدية مثالية للتعبير عن المشاعر الرقيقة. يجمع بين الدفء والجمال ليكون هدية لا تُنسى لمن تحب.': 'A soft high-quality teddy bear with a bouquet of natural pink roses, combining warmth and beauty for an unforgettable gift.',
+  'بوكس تخرج مصمم خصيصًا للاحتفال بإنجاز التخرج، يحتوي على ورد وحلويات وبطاقة تهنئة قابلة للتخصيص. الهدية المثالية لتهنئة الخريجين بهذا الإنجاز الكبير.': 'A graduation box designed to celebrate achievement, with flowers, sweets, and a customizable greeting card.',
+  'بوكيه ورد أبيض أنيق مصمم بعناية فائقة، يرمز للنقاء والصفاء. خيار مثالي للمناسبات الراقية والتعبير عن الاحترام والتقدير بأسلوب راقٍ.': 'An elegant white rose bouquet symbolizing purity and serenity, ideal for refined occasions and expressions of appreciation.',
+  'بوكيه ورد وردي رومانطقية مصمم بعناية، يرمز للحب والرقة. خيار مثالي للتعبير عن المشاعر النبيلة بأسلوب راقٍ وأنيق.': 'A carefully designed romantic pink rose bouquet symbolizing love and tenderness.',
+  'بوكس خطوبة فاخر مصمم خصيصًا لمناسبات الخطوبة، يحتوي على ورد أحمر فاخر وحلويات راقية مع إمكانية إضافة رسالة مخصصة. اجعل لحظة الخطوبة لا تُنسى.': 'A luxury engagement box with premium red roses, elegant sweets, and an optional personalized message.',
+  'بوكس يجمع بين العطر الفاخر والشوكولاتة الراقية، هدية مثالية لمن يستحق الأفضل. تصميم أنيق ومحتوى متميز يجعلها هدية لا تُنسى.': 'A box combining luxury perfume and fine chocolate in an elegant presentation for an unforgettable gift.',
+  'بوكس يجمع بين الورد الطبيعي الفاخر والشوكولاتة البلجيكية، هدية كلاسيكية راقية تناسب كل المناسبات. تصميم أنيق ومحتوى متميز يضمن رضا من يهديها.': 'A classic elegant box combining fresh premium flowers and Belgian chocolate, suitable for every occasion.',
+  'بوكس عناية شخصية يحتوي على تشكيلة مختارة من منتجات العناية الفاخرة بالبشرة، هدية مثالية لمن يستحق الرعاية والاهتمام. منتجات طبيعية بجودة عالية.': 'A personal care box with selected premium skincare products, a thoughtful gift made with high-quality natural products.',
+  'بوكس قهوة وحلويات يحتوي على تشكيلة مختارة من أجود أنواع القهوة مع حلويات شهية، هدية مثالية لمحبي القهوة. تصميم أنيق ومحتوى راقٍ يجعلها هدية مميزة.': 'A coffee and sweets box featuring selected quality coffee and delicious treats in an elegant presentation.',
+  'بوكس ذكرى خاصة مصمم للاحتفال بالمناسبات والذكريات المميزة، يحتوي على ورد فاخر وشوكولاتة وهدية تذكارية. اجعل ذكرياتك لا تُنسى بهذا البوكس الراقي.': 'A special memory box with premium flowers, chocolate, and a keepsake, designed to celebrate meaningful moments.',
+  'بوكس مفاجئة يحتوي على تشكيلة متنوعة من الهدايا المميزة، مصمم لإحداث عنصر المفاجأة والفرح. اختر هذا البوكس إذا كنت تريد هدية مليئة بالبهجة والإثارة.': 'A surprise box filled with a varied selection of special gifts, designed to bring excitement and joy.',
+  'هدية فريدة مخصصة بالاسم مع إمكانية النقش الاحترافي، مثالية للمناسبات الخاصة التي تحتاج لمسة شخصية. اجعل هديتك لا تُنسى باسم من تحب.': 'A unique personalized name gift with professional engraving, perfect for occasions that deserve a personal touch.',
+  'صندوق هدية مخصص يمكنك تصميمه حسب رغبتك، اختر محتوياته ولون التغليف والرسالة. مثالي لمن يريد هدية فريدة تعكس شخصيته وشخصية من يهديها.': 'A custom gift box you can design your way—choose the contents, wrapping color, and message for a truly personal gift.',
+  'مثال: 059xxxxxxx': 'Example: 059xxxxxxx', 'مثال: وقت التوصيل أو أي تفاصيل إضافية': 'Example: delivery time or any additional details',
+  'مثال: بوكس ورد فاخر': 'Example: Luxury Rose Box', 'مثال: بوكس ورد فاخر مع شوكولاتة وبطاقة إهداء': 'Example: Luxury rose box with chocolate and a gift card',
+  'مثال: أحمر وذهبي': 'Example: Red and gold', 'مثال: كل عام وأنتِ بخير': 'Example: Wishing you a wonderful year',
+  'مثال: 200 - 300 ريال': 'Example: 200 - 300 QAR', 'أي تفاصيل أخرى تريد إضافتها': 'Any other details you would like to add',
+  'أي ملاحظات أخرى تريد إضافتها': 'Any other notes you would like to add', 'اكتب اسم الشخص المراد إهداء الهدية له': 'Enter the recipient’s name',
+  'اسم الشخص المراد إهداء الهدية له': 'Recipient Name', 'اكتب رسالتك التي ستُرفق مع الهدية': 'Write the message to include with the gift',
+  'اكتب رسالتك هنا...': 'Write your message here...', 'اكتب وصف الهدية ومحتوياتها...': 'Describe the gift and its contents...',
+  'بدون تغليف': 'No Wrapping', 'تغليف بسيط': 'Simple Wrapping', 'تغليف أنيق': 'Elegant Wrapping', 'تغليف فاخر': 'Luxury Wrapping',
+  'بوكس أنيق': 'Elegant Box', 'بوكس خشبي': 'Wooden Box', 'صندوق مبطن': 'Lined Box', 'شريط حرير': 'Silk Ribbon',
+  'بطاقة إهداء': 'Gift Card', 'بطاقة إهداء مجانية': 'Free Gift Card', 'بطاقة تهنئة': 'Greeting Card', 'رسالة مخصصة': 'Personalized Message',
+  'ورد طبيعي': 'Fresh Flowers', 'ورد طبيعي طازج': 'Fresh Natural Flowers', 'ورد أحمر فاخر': 'Premium Red Roses', 'ورد وردي طبيعي': 'Natural Pink Roses',
+  'ورد أبيض طبيعي': 'Natural White Roses', 'شوكولاتة بلجيكية': 'Belgian Chocolate', 'شوكولاتة فاخرة': 'Premium Chocolate',
+  'شوكولاتة وحلويات': 'Chocolate & Sweets', 'حلويات راقية': 'Fine Sweets', 'حلويات شهية': 'Delicious Sweets',
+  'عطر فاخر': 'Luxury Perfume', 'قهوة مختارة': 'Selected Coffee', 'منتجات طبيعية': 'Natural Products', 'هدية تذكارية': 'Keepsake',
+  'تصميم أنيق': 'Elegant Design', 'تصميم احتفالي': 'Celebration Design', 'تصميم رومانطقي': 'Romantic Design', 'تصميم شخصي': 'Personal Design',
+  'تصميم فريد': 'Unique Design', 'جودة عالية': 'High Quality', 'طازج مضمون': 'Guaranteed Fresh', 'مقاس مثالي': 'Perfect Size',
+  'خيارات متعددة': 'Multiple Options', 'خيارات متنوعة': 'Varied Options', 'تشكيلة مختارة': 'Selected Assortment', 'تشكيلة متنوعة': 'Varied Selection',
+  'محتويات متنوعة': 'Varied Contents', 'عنصر مفاجأة': 'Surprise Element', 'هدية مثالية': 'Perfect Gift', 'هدية عملية': 'Practical Gift',
+  'ظاهر': 'Visible', 'مخفي': 'Hidden', 'متوفر': 'Available', 'نفد': 'Out of Stock', 'إزالة': 'Remove',
+  'أخرى': 'Other', 'زفاف': 'Wedding', 'ذكرى سنوية': 'Anniversary', 'حلويات': 'Sweets', 'الدوحة': 'Doha', 'الريان': 'Al Rayyan', 'الوكرة': 'Al Wakrah',
+  'مرحبا، أريد الاستفسار': 'Hello, I would like to ask a question', 'مرحبا، أريد الاستفسار عن هدية': 'Hello, I would like to ask about a gift',
+  'مرحبا، أريد طلب هدية عبر واتساب': 'Hello, I would like to order a gift via WhatsApp'
 };
 
 const partial: Array<[RegExp, string]> = [
@@ -145,10 +214,19 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const observer = new MutationObserver((mutations) => {
       if (language !== 'en') return;
       for (const mutation of mutations) {
+        if (mutation.type === 'characterData') {
+          const node = mutation.target;
+          const original = (node as Node & { __arOriginal?: string }).__arOriginal ?? node.nodeValue ?? '';
+          if (/[\u0600-\u06ff]/.test(original)) {
+            (node as Node & { __arOriginal?: string }).__arOriginal = original;
+            const translated = translateText(original);
+            if (node.nodeValue !== translated) node.nodeValue = translated;
+          }
+        }
         for (const node of Array.from(mutation.addedNodes)) translateNode(node);
       }
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
     return () => observer.disconnect();
   }, [language]);
 
