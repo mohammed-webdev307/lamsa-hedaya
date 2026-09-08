@@ -29,6 +29,10 @@ export function StoreSettingsProvider({ children }: { children: React.ReactNode 
     refresh();
   }, []);
 
+  useEffect(() => {
+    document.documentElement.style.setProperty('--brand-primary', settings.primaryColor || DEFAULT_STORE_SETTINGS.primaryColor);
+  }, [settings.primaryColor]);
+
   const value = useMemo(() => ({ settings, loading, refresh }), [settings, loading]);
 
   return <StoreSettingsContext.Provider value={value}>{children}</StoreSettingsContext.Provider>;

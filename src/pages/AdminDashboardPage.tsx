@@ -666,6 +666,27 @@ export default function AdminDashboardPage() {
                   </div>
                 )}
               </div>
+              <div className="sm:col-span-2">
+                <label className="label-lux">اللون الرئيسي للموقع</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="color"
+                    aria-label="اللون الرئيسي للموقع"
+                    value={settingsForm.primaryColor || '#8B6B3E'}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, primaryColor: e.target.value })}
+                    className="h-12 w-16 cursor-pointer rounded-lg border border-beige-200 bg-white p-1"
+                  />
+                  <input
+                    dir="ltr"
+                    className="input-lux max-w-40 text-left"
+                    value={settingsForm.primaryColor || '#8B6B3E'}
+                    onChange={(e) => setSettingsForm({ ...settingsForm, primaryColor: e.target.value })}
+                    placeholder="#8B6B3E"
+                    maxLength={7}
+                  />
+                  <span className="text-sm text-brown-400">اختر لون هوية المتجر</span>
+                </div>
+              </div>
               <div>
                 <label className="label-lux">رقم واتساب</label>
                 <input dir="ltr" className="input-lux text-left" value={settingsForm.whatsappNumber} onChange={(e) => setSettingsForm({ ...settingsForm, whatsappNumber: e.target.value })} placeholder="974XXXXXXXX" />

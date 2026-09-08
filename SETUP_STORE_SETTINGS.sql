@@ -38,3 +38,7 @@ on conflict (id) do nothing;
 
 grant select on public.store_settings to anon, authenticated;
 grant insert, update on public.store_settings to authenticated;
+
+
+-- Theme color
+alter table public.store_settings add column if not exists primary_color text not null default '#8B6B3E';

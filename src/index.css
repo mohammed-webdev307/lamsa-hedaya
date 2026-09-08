@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --brand-primary: #8B6B3E;
+}
+
 @layer base {
   * {
     -webkit-tap-highlight-color: transparent;
@@ -123,3 +127,19 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #A89164;
 }
+
+
+/* Store brand color: controlled from Admin > Store Settings */
+.btn-primary {
+  background-color: var(--brand-primary) !important;
+}
+.btn-primary:hover {
+  background-color: color-mix(in srgb, var(--brand-primary) 86%, black) !important;
+}
+.btn-gold {
+  background-image: linear-gradient(to left, color-mix(in srgb, var(--brand-primary) 82%, white), var(--brand-primary)) !important;
+  color: white !important;
+}
+.bg-gold-400, .bg-gold-500 { background-color: var(--brand-primary) !important; }
+.border-gold-400 { border-color: var(--brand-primary) !important; }
+.text-gold-500, .text-gold-600 { color: var(--brand-primary) !important; }

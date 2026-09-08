@@ -55,6 +55,7 @@ const exact: Record<string, string> = {
   'إضافة منتج جديد': 'Add New Product', 'تعديل المنتج': 'Edit Product', 'حفظ المنتج': 'Save Product', 'جارٍ الحفظ...': 'Saving...', 'حذف': 'Delete', 'تعديل': 'Edit',
   'لوحة إدارة المنتجات': 'Product Management', 'أضف المنتجات وعدّل الأسعار والتوفر من داخل الموقع': 'Add products and manage prices and availability from the website',
   'إعدادات المتجر': 'Store Settings', 'غيّر بيانات المتجر التي تظهر للزبائن بدون تعديل الكود': 'Change the store information shown to customers without editing code',
+  'اللون الرئيسي للموقع': 'Website Primary Color', 'اختر لون هوية المتجر': 'Choose your store brand color',
   'اسم المتجر': 'Store Name', 'الشعار النصي': 'Tagline', 'شعار المتجر': 'Store Logo', 'جارٍ رفع الشعار...': 'Uploading logo...', 'اختر شعارًا من الجهاز': 'Choose Logo from Device', 'إزالة الشعار': 'Remove Logo', 'يفضل PNG بخلفية شفافة': 'PNG with transparent background is recommended', 'رقم واتساب': 'WhatsApp Number', 'البريد الإلكتروني': 'Email', 'اسم إنستغرام': 'Instagram Username', 'رابط إنستغرام': 'Instagram URL',
   'الموقع': 'Location', 'العملة': 'Currency', 'اسم العملة': 'Currency Name', 'ساعات العمل - السبت إلى الخميس': 'Working Hours - Saturday to Thursday', 'ساعات العمل - الجمعة': 'Working Hours - Friday',
   'وصف المتجر في أسفل الموقع': 'Store Description in Footer', 'حفظ إعدادات المتجر': 'Save Store Settings', 'تم حفظ إعدادات المتجر بنجاح': 'Store settings saved successfully',
